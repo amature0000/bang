@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        function callTestFunction() {
+            // 입력된 텍스트 가져오기
+            let inputValue = document.getElementById("inputText").value;
+
+            // test 함수 호출
+            createRoom(inputValue);
+        }
+
+        async function createRoom(name) {
+            try {
+                const apiUrl = `/api/chat/new?name=${name}`;
+                const response = await fetch(apiUrl, { method: "GET" });
+                if (!response.ok) {
+                    console.error(`HTTP error! Status: ${response.status}`);
+                    return;
+                }
+                const roomDTO = await response.json();
+                console.log(roomDTO);
+                //TODO
+            } catch (error) {
+                console.error("Error creating room:", error);
+            }
+        }
+
+    </script>
+</head>
+<body>
+<input type="text" id="inputText" placeholder="Enter text">
+<button onclick="callTestFunction()">Click Me</button>
+</body>
+</html>

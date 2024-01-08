@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chat Rooms</title>
+</head>
+<body>
+<h1>Chat Rooms</h1>
+<ul>
+    <li th:each="room : ${chatRooms}">
+        <span th:text="${room.name}"></span> opened at UUID = <span th:text="${room.roomId}"></span>
+    </li>
+</ul>
+</body>
+</html>
