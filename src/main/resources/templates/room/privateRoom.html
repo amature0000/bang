@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+</head>
+<body>
+<div>
+    <ul id="chatMessages"></ul>
+    <input type="text" id="roomIdInput" placeholder="roomId">
+    <input type="text" id="senderInput" placeholder="sender">
+    <input type="text" id="messageInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+    const socket = new WebSocket("ws://localhost:8080/ws/chat");
+
+    socket.onmessage = function (event) {
+        const message = JSON.parse(event.data);
+        displayMessage(message);
+    };
+
+    function displayMessage(message) {
+        const chatMessages = document.getElementById("chatMessages");
+        const li = document.createElement("li");
+        li.appendChild(document.createTextNode(message.sender + " : " + message.message));
+        chatMessages.appendChild(li);
+    }
+
+    function sendMessage() {
+        const messageInput = document.getElementById("messageInput");
+
+        const roomId = document.getElementById("roomIdInput").value; // Replace with your desired roomId
+        const sender = document.getElementById("senderInput").value;
+        const content = messageInput.value.trim();
+
+        let messageType = "TALK";
+        if(content === "")  {
+            messageType = "ENTER"
+        }
+
+        const data = {
+            type: messageType,
+            roomId: roomId,
+            sender: sender,
+            message: content
+        };
+
+        socket.send(JSON.stringify(data));
+        messageInput.value = "";
+    }
+
+
+</script>
+</body>
+</html>
