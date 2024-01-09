@@ -3,10 +3,7 @@ package socketTest.socketTestspring.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import socketTest.socketTestspring.Exception.Response;
 import socketTest.socketTestspring.domain.Member;
 import socketTest.socketTestspring.dto.MemberJoinRequest;
@@ -26,5 +23,9 @@ public class MemberController {
         Member join = memberService.join(memberJoinRequest.toEntity(encoder.encode(memberJoinRequest.getMemberPassword())));
         MemberJoinResponse memberJoinResponse = new MemberJoinResponse(join);
         return Response.success(memberJoinResponse);
+    }
+    @GetMapping("/login")
+    public String login() {
+        return "login action";
     }
 }
