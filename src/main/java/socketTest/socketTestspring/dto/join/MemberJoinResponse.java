@@ -1,4 +1,4 @@
-package socketTest.socketTestspring.dto;
+package socketTest.socketTestspring.dto.join;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,7 @@ public class MemberJoinResponse { //사용자 응답 DTO
     private String memberPassword;
 
     public MemberJoinResponse(Member member){
-        this.memberId = member.getMemberID();
+        this.memberId = member.getMemberId();
         this.memberPassword = member.getMemberPassword();
     }
 
