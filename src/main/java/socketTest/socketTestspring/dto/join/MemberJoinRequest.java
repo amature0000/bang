@@ -1,4 +1,4 @@
-package socketTest.socketTestspring.dto;
+package socketTest.socketTestspring.dto.join;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,11 +10,11 @@ import socketTest.socketTestspring.domain.Member;
 @AllArgsConstructor
 
 public class MemberJoinRequest {
-    private String memberID;
+    private String memberId;
     private String memberPassword;
     private String memberName;
 
     public Member toEntity(String memberPassword){
-        return new Member(this.memberID, memberPassword, this.memberName);
+        return new Member(this.memberId, memberPassword, this.memberName);
     }
 }
