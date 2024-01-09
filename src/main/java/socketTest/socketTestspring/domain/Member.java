@@ -34,5 +34,4 @@ public class Member {
         this.memberName = memberJoinRequest.getMemberName();
 
     }
-
 }

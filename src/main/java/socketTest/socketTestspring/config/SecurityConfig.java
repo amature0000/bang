@@ -15,7 +15,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .httpBasic(AbstractHttpConfigurer::disable) // 기본 UI 사용, 사용하지 않을 시 disable()
-                .csrf(AbstractHttpConfigurer::disable) // REST API에서 CSRF 보안이 필요없기 때문에 비활성화
+                .csrf(AbstractHttpConfigurer::disable) //REST API에서 CSRF 보안이 필요없기 때문에 비활성화
                 .cors(Customizer.withDefaults())
                 .authorizeRequests((authz) -> authz  // 요청에 대한 사용 권한을 체크
                         .requestMatchers("/api/**").permitAll() //requestMatchers 파라미터로 설정한 리소스 접근을 인증절차 없이 허용
