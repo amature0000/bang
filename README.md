@@ -27,4 +27,5 @@ dependencies {
 
 - application.properties
 ```
+jwt.token.secret={key} // secret key
 ```
