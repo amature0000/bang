@@ -9,6 +9,7 @@ import socketTest.socketTestspring.Exception.ErrorCode;
 import socketTest.socketTestspring.Exception.BangGameException;
 import socketTest.socketTestspring.domain.Member;
 import socketTest.socketTestspring.repository.MemberRepository;
+import socketTest.socketTestspring.tools.JwtTokenUtil;
 
 
 @Service
@@ -22,7 +23,7 @@ public class MemberService {
     public Member join(Member member){
         memberRepository.findByMemberId(member.getMemberId())
                 .ifPresent(member1 -> {
-                    throw new BangGameException(ErrorCode.DUPLILCATED_USER_ID, String.format("UserId : %s",member1.getMemberId()));
+                    throw new BangGameException(ErrorCode.DUPLICATED_USER_ID, String.format("UserId : %s",member1.getMemberId()));
                 }); //같은 ID 가진 회원 BangGameException 에러 발생
         memberRepository.save(member);
 

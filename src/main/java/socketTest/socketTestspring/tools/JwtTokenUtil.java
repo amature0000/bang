@@ -1,4 +1,4 @@
-package socketTest.socketTestspring.service;
+package socketTest.socketTestspring.tools;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
