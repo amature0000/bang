@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import socketTest.socketTestspring.dto.MemberJoinRequest;
+import socketTest.socketTestspring.dto.join.MemberJoinRequest;
 
 @Entity
 @Getter
@@ -15,24 +15,23 @@ public class Member {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String memberID;
+    private String memberId;
     @Column(nullable = false)
     private String memberPassword;
 
     @Column(nullable = false)
     private String memberName;
 
-    public Member(String memberID, String memberPassword, String memberName){
-        this.memberID = memberID;
+    public Member(String memberId, String memberPassword, String memberName){
+        this.memberId = memberId;
         this.memberPassword = memberPassword;
         this.memberName = memberName;
     }
 
     public Member(MemberJoinRequest memberJoinRequest){
-        this.memberID = memberJoinRequest.getMemberID();
+        this.memberId = memberJoinRequest.getMemberId();
         this.memberPassword = memberJoinRequest.getMemberPassword();
         this.memberName = memberJoinRequest.getMemberName();
 
     }
-
 }
