@@ -32,14 +32,14 @@ public class MemberService {
 
     @Value("${jwt.token.secret}")
     private String secretKey;
-    private long expiredTimeMs = 1000* 60 * 60; //토큰 유지 시간 1시간
+    private final long expiredTimeMs = 1000* 60 * 60; //토큰 유지 시간 1시간
 
     public String login(String memberId, String memberPassword){
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new BangGameException(ErrorCode.USER_NOT_FOUNDED,String.format("%s는 가입된 적이 없습니다.", memberId)));
 
         if(!encoder.matches(memberPassword, member.getMemberPassword())){
-            throw new BangGameException(ErrorCode.INVALID_PASSWORD,String.format("Id 또는 Password가 잘못 되었습니다."));
+            throw new BangGameException(ErrorCode.INVALID_PASSWORD,"Id 또는 Password가 잘못 되었습니다.");
         }
         return JwtTokenUtil.createToken(memberId,secretKey,expiredTimeMs);
     }
