@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
                         .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/ws").permitAll() //TODO 인가해야만 ws 업그레이드 가능하도록 바꾸기
                 )
 
                 .sessionManagement(sessionManagement -> sessionManagement
