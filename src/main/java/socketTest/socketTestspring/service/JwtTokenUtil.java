@@ -3,10 +3,7 @@ package socketTest.socketTestspring.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-
 import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
 import java.util.Date;
 
 public class JwtTokenUtil {
