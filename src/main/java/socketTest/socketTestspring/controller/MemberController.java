@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import socketTest.socketTestspring.exception.Response;
 import socketTest.socketTestspring.domain.Member;
 import socketTest.socketTestspring.dto.join.MemberJoinRequest;
 import socketTest.socketTestspring.dto.join.MemberJoinResponse;
 import socketTest.socketTestspring.dto.login.MemberLoginRequest;
 import socketTest.socketTestspring.dto.login.MemberLoginResponse;
+import socketTest.socketTestspring.exception.Response;
 import socketTest.socketTestspring.service.MemberService;
 
 @RestController
