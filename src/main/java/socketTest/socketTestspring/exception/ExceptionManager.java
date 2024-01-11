@@ -7,18 +7,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import socketTest.socketTestspring.exception.myExceptions.ErrorCode;
 
 @RestControllerAdvice
 public class ExceptionManager {
-    /*
     @ExceptionHandler(BangGameException.class)
     public ResponseEntity<?> bangGameExceptionHandler(BangGameException e){
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(MyResponse.error(errorCode.getMessage()));
     }
-
-     */
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<?> dataIntegrityViolationExceptionHandler(DataIntegrityViolationException e){
