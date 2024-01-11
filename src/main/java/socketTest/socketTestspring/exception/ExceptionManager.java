@@ -13,10 +13,13 @@ public class ExceptionManager {
     /*
     @ExceptionHandler(BangGameException.class)
     public ResponseEntity<?> bangGameExceptionHandler(BangGameException e){
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus())
-                .body(Response.error(e.getErrorCode().getMessage()));
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(MyResponse.error(errorCode.getMessage()));
     }
+
      */
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<?> dataIntegrityViolationExceptionHandler(DataIntegrityViolationException e){
         return ResponseEntity.status(HttpStatus.CONFLICT)

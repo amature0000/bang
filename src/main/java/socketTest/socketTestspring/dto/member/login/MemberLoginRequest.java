@@ -1,4 +1,4 @@
-package socketTest.socketTestspring.dto.login;
+package socketTest.socketTestspring.dto.member.login;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

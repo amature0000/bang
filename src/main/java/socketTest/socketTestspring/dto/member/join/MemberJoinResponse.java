@@ -1,4 +1,4 @@
-package socketTest.socketTestspring.dto.join;
+package socketTest.socketTestspring.dto.member.join;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
