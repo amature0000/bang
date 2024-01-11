@@ -5,8 +5,8 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /**
+ * 기존에 정의된 Exceptions 를 사용하는 게 더 나을 것 같음.
  * 예외 문구 추가는 하는 중
- * @deprecated 기존에 정의된 Exceptions 를 사용하는 게 더 나을 것 같음.
  */
 @AllArgsConstructor
 @Getter

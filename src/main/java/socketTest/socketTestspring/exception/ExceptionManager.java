@@ -21,19 +21,25 @@ public class ExceptionManager {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<?> dataIntegrityViolationExceptionHandler(DataIntegrityViolationException e){
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Response.error(e.getMessage()));
+                .body(MyResponse.error(e.getMessage()));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> entityNotFoundExceptionHandler(EntityNotFoundException e){
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Response.error(e.getMessage()));
+                .body(MyResponse.error(e.getMessage()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> badCredentialsExceptionHandler(BadCredentialsException e){
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Response.error(e.getMessage()));
+                .body(MyResponse.error(e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<?> IllegalStateException(BadCredentialsException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(MyResponse.error(e.getMessage()));
     }
 }
 //Exception

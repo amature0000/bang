@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import socketTest.socketTestspring.domain.Member;
+import socketTest.socketTestspring.exception.myExceptions.BangGameException;
 import socketTest.socketTestspring.repository.MemberRepository;
 import socketTest.socketTestspring.tools.JwtTokenUtil;
 
@@ -32,13 +33,15 @@ public class MemberService {
 
     @Value("${jwt.token.secret}")
     private String secretKey;
-    private final long EXPIRED = 1000* 60 * 60; //토큰 유지 시간 1시간
+    static private final long EXPIRE_TIME = 1000* 60 * 60; //토큰 유지 시간 1시간
 
     public String login(String memberId, String memberPassword){
-        Member member = memberRepository.findByMemberIdAndMemberPassword(memberId, encoder.encode(memberPassword))
-                .orElseThrow(() -> new EntityNotFoundException("wrong user Id or Password"));
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() ->  new EntityNotFoundException("wrong user Id or Password"));
 
-        return JwtTokenUtil.createToken(memberId,secretKey, EXPIRED);
+        if(!encoder.matches(memberPassword, member.getMemberPassword())){
+            throw new EntityNotFoundException("wrong user Id or Password");
+        }
+        return JwtTokenUtil.createToken(memberId,secretKey,EXPIRE_TIME);
     }
-
 }
