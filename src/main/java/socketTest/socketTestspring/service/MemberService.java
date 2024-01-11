@@ -8,7 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import socketTest.socketTestspring.domain.Member;
-import socketTest.socketTestspring.exception.myExceptions.BangGameException;
 import socketTest.socketTestspring.repository.MemberRepository;
 import socketTest.socketTestspring.tools.JwtTokenUtil;
 
@@ -33,7 +32,7 @@ public class MemberService {
 
     @Value("${jwt.token.secret}")
     private String secretKey;
-    static private final long EXPIRE_TIME = 1000* 60 * 60; //토큰 유지 시간 1시간
+    private static final long EXPIRE_TIME = 1000* 60 * 60; //토큰 유지 시간 1시간
 
     public String login(String memberId, String memberPassword){
         Member member = memberRepository.findByMemberId(memberId)

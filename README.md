@@ -35,3 +35,12 @@ spring.datasource.password=
 spring.h2.console.enabled=true
 spring.jpa.hibernate.ddl-auto=update
 ```
+```
+jwt.token.secret=
+spring.datasource.url=jdbc:h2:tcp://localhost/~/test
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.h2.console.enabled=true
+spring.jpa.hibernate.ddl-auto=none
+```
