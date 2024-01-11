@@ -1,6 +1,7 @@
 package socketTest.socketTestspring.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,35 +10,41 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import socketTest.socketTestspring.exception.myExceptions.ErrorCode;
 
+@Slf4j
 @RestControllerAdvice
 public class ExceptionManager {
     @ExceptionHandler(BangGameException.class)
     public ResponseEntity<?> bangGameExceptionHandler(BangGameException e){
         ErrorCode errorCode = e.getErrorCode();
+        log.error(errorCode.getMessage());
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(MyResponse.error(errorCode.getMessage()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<?> dataIntegrityViolationExceptionHandler(DataIntegrityViolationException e){
+        log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(MyResponse.error(e.getMessage()));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> entityNotFoundExceptionHandler(EntityNotFoundException e){
+        log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(MyResponse.error(e.getMessage()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> badCredentialsExceptionHandler(BadCredentialsException e){
+        log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(MyResponse.error(e.getMessage()));
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<?> IllegalStateException(BadCredentialsException e){
+        log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(MyResponse.error(e.getMessage()));
     }
