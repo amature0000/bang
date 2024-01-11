@@ -17,7 +17,6 @@ public class ExceptionManager {
                 .body(Response.error(e.getErrorCode().getMessage()));
     }
      */
-
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<?> dataIntegrityViolationExceptionHandler(DataIntegrityViolationException e){
         return ResponseEntity.status(HttpStatus.CONFLICT)

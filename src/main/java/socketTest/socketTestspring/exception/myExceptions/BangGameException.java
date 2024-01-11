@@ -13,7 +13,7 @@ public class BangGameException extends RuntimeException{
     private String message;
 
     @Override
-    public String toString(){
+    public String toString() {
         if (message == null) return errorCode.getMessage();
         return String.format("%s, %s", errorCode.getMessage(), message);
     }
