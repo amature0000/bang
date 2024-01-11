@@ -1,4 +1,4 @@
-package socketTest.socketTestspring.Exception;
+package socketTest.socketTestspring.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

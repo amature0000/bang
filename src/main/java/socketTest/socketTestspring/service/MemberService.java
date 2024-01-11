@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import socketTest.socketTestspring.Exception.ErrorCode;
-import socketTest.socketTestspring.Exception.BangGameException;
+import socketTest.socketTestspring.exception.ErrorCode;
+import socketTest.socketTestspring.exception.BangGameException;
 import socketTest.socketTestspring.domain.Member;
 import socketTest.socketTestspring.repository.MemberRepository;
 
@@ -22,7 +22,7 @@ public class MemberService {
     public Member join(Member member){
         memberRepository.findByMemberId(member.getMemberId())
                 .ifPresent(member1 -> {
-                    throw new BangGameException(ErrorCode.DUPLILCATED_USER_ID, String.format("UserId : %s",member1.getMemberId()));
+                    throw new BangGameException(ErrorCode.DUPLICATED_USER_ID, String.format("UserId : %s",member1.getMemberId()));
                 }); //같은 ID 가진 회원 BangGameException 에러 발생
         memberRepository.save(member);
 
@@ -31,7 +31,7 @@ public class MemberService {
 
     @Value("${jwt.token.secret}")
     private String secretKey;
-    private long expiredTimeMs = 1000* 60 * 60; //토큰 유지 시간 1시간
+    private final long expiredTimeMs = 1000* 60 * 60; //토큰 유지 시간 1시간
 
     public String login(String memberId, String memberPassword){
         Member member = memberRepository.findByMemberId(memberId)
