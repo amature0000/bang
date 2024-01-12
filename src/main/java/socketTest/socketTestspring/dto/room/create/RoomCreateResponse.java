@@ -9,9 +9,11 @@ import socketTest.socketTestspring.domain.Room;
 public class RoomCreateResponse {
     private String roomId;
     private String roomName;
+    private String ownerMemberId;
 
     public RoomCreateResponse(Room room) {
         this.roomId = room.getRoomId();
         this.roomName = room.getRoomName();
+        this.ownerMemberId = room.getOwnerMemberId();
     }
 }

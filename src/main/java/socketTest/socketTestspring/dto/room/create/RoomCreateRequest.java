@@ -10,8 +10,9 @@ import socketTest.socketTestspring.domain.Room;
 @AllArgsConstructor
 public class RoomCreateRequest {
     private String roomName;
+    private String memberId;
 
     public Room toEntity() {
-        return new Room(this.roomName);
+        return new Room(this.roomName, this.memberId);
     }
 }
