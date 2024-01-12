@@ -21,9 +21,13 @@ public class Room {
     @Column(nullable = false)
     private String roomName; // 채팅방 이름
 
-    public Room(String roomName){
+    @Column(nullable = false)
+    private String ownerMemberId;
+
+    public Room(String roomName, String memberId){
         this.roomName = roomName;
         this.roomId = UUID.randomUUID().toString();
+        this.ownerMemberId = memberId;
     }
 }
 

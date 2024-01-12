@@ -28,6 +28,7 @@ dependencies {
 - application.properties
 ```
 jwt.token.secret= //64byte 이상 string Key 필요
+jwt.token.expireTime=3600
 spring.datasource.url=jdbc:h2:~/testdb
 spring.datasource.driverClassName=org.h2.Driver
 spring.datasource.username=sa
@@ -35,12 +36,7 @@ spring.datasource.password=
 spring.h2.console.enabled=true
 spring.jpa.hibernate.ddl-auto=update
 ```
+- 또는 시도 : datasource.url
 ```
-jwt.token.secret=
 spring.datasource.url=jdbc:h2:tcp://localhost/~/test
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-spring.h2.console.enabled=true
-spring.jpa.hibernate.ddl-auto=none
 ```
