@@ -1,12 +1,10 @@
 package socketTest.socketTestspring.repository;
 
-import socketTest.socketTestspring.domain.ChatRoom;
+import org.springframework.data.jpa.repository.JpaRepository;
+import socketTest.socketTestspring.domain.Room;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface RoomRepository {
-    public List<ChatRoom> findAllRoom();
-    public Optional<ChatRoom> findRoomById(String roomId);
-    public ChatRoom createRoom(ChatRoom chatRoom);
+public interface RoomRepository extends JpaRepository<Room, Long> {
+    Optional<Room> findByRoomId(String roomId);
 }

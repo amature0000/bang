@@ -24,7 +24,7 @@ public class MemberService {
         memberRepository.findByMemberId(member.getMemberId())
                 .ifPresent(member1 -> {
                     throw new DataIntegrityViolationException("user Id is duplicated");
-                }); //같은 ID 가진 회원 BangGameException 에러 발생
+                });
         memberRepository.save(member);
 
         return member;
@@ -43,4 +43,6 @@ public class MemberService {
         }
         return JwtTokenUtil.createToken(memberId,secretKey,EXPIRE_TIME);
     }
+
+    //TODO : 방 입장, 퇴장 관련 로직 구현
 }

@@ -1,4 +1,4 @@
-package socketTest.socketTestspring.dto.join;
+package socketTest.socketTestspring.dto.member.join;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +8,6 @@ import socketTest.socketTestspring.domain.Member;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class MemberJoinRequest {
     private String memberId;
     private String memberPassword;

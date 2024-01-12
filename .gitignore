@@ -1,4 +1,5 @@
 HELP.md
+application.properties
 git push.bat
 .gradle
 build/
