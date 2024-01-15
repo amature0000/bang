@@ -1,13 +1,17 @@
 package socketTest.socketTestspring.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.security.authorization.AuthorityAuthorizationManager;
+import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
 import org.springframework.web.socket.config.annotation.*;
 
 /**
  * WebSocket config 파일
  * 구독/발행 경로를 지정하고, websocket endpoint 를 설정
- * @author 주현수
  */
 @Configuration
 @EnableWebSocketMessageBroker

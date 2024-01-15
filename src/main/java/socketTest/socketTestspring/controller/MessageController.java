@@ -6,9 +6,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 import socketTest.socketTestspring.dto.Message;
 
-/**
- * Stomp 프로토콜 메세지 컨트롤러
- */
+
 @Controller
 @RequiredArgsConstructor
 public class MessageController {

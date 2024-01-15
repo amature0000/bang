@@ -3,10 +3,10 @@ package socketTest.socketTestspring.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import socketTest.socketTestspring.domain.Room;
 import socketTest.socketTestspring.dto.room.create.RoomCreateRequest;
 import socketTest.socketTestspring.dto.room.create.RoomCreateResponse;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteRequest;
+import socketTest.socketTestspring.dto.room.delete.RoomDeleteResponse;
 import socketTest.socketTestspring.exception.MyResponse;
 import socketTest.socketTestspring.service.RoomService;
 
@@ -21,15 +21,13 @@ public class RoomController {
 
     @PostMapping("/new")
     public MyResponse<RoomCreateResponse> createRoom(@RequestBody RoomCreateRequest roomCreateRequest){
-        Room room = roomService.createRoom(roomCreateRequest.toEntity());
-        RoomCreateResponse roomCreateResponse = new RoomCreateResponse(room);
+        RoomCreateResponse roomCreateResponse = roomService.createRoom(roomCreateRequest);
         return MyResponse.success(roomCreateResponse);
     }
 
     @PostMapping("/delete")
-    public String deleteRoom(@RequestBody RoomDeleteRequest roomDeleteRequest){
-        //TODO : token 으로 사용자를 식별하여 room 의 admin 권한이 있는지 검사
-
-        return roomService.deleteRoom(roomDeleteRequest.getRoomId());
+    public MyResponse<RoomDeleteResponse> deleteRoom(@RequestBody RoomDeleteRequest roomDeleteRequest){
+        RoomDeleteResponse roomDeleteResponse = roomService.deleteRoom(roomDeleteRequest);
+        return MyResponse.success(roomDeleteResponse);
     }
 }
