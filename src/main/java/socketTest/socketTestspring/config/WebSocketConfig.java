@@ -1,12 +1,7 @@
 package socketTest.socketTestspring.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.security.authorization.AuthorityAuthorizationManager;
-import org.springframework.security.authorization.AuthorizationManager;
-import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
 import org.springframework.web.socket.config.annotation.*;
 
 /**

@@ -1,6 +1,5 @@
 package socketTest.socketTestspring.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import socketTest.socketTestspring.dto.room.delete.RoomDeleteResponse;
 import socketTest.socketTestspring.exception.MyException;
 import socketTest.socketTestspring.exception.myExceptions.GameRuleErrorCode;
 import socketTest.socketTestspring.repository.RoomRepository;
-import socketTest.socketTestspring.tools.JwtTokenUtil;
 
 
 @Service

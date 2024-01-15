@@ -28,7 +28,6 @@ dependencies {
 - application.properties
 ```
 jwt.token.secret= //64byte 이상 string Key 필요
-jwt.token.expireTime=3600
 spring.datasource.url=jdbc:h2:~/testdb
 spring.datasource.driverClassName=org.h2.Driver
 spring.datasource.username=sa
