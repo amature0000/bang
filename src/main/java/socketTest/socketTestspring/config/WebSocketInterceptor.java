@@ -49,11 +49,7 @@ public class WebSocketInterceptor implements ChannelInterceptor {
     }
     //TODO : 만약 WebSocketSecurityConfig 로 인증된다면 필요없어짐.
     private void handleConnect(StompHeaderAccessor accessor) {
-        String token = accessor.getFirstNativeHeader("Authorization"); // client 로부터 Authorization 헤더로 전달받은 JWT 토큰
 
-        if (!jwtTokenUtil.isValidToken(token)) {
-            throw new BadCredentialsException("Invalid or missing authentication token");
-        }
     }
     private void handleDisconnect(StompHeaderAccessor accessor) {
         // DISCONNECT 요청 처리 로직
