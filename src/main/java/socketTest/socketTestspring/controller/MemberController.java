@@ -16,7 +16,7 @@ import socketTest.socketTestspring.exception.MyResponse;
 import socketTest.socketTestspring.service.MemberService;
 
 @RestController
-@RequestMapping("api/v1/users")
+@RequestMapping("api/users")
 @RequiredArgsConstructor
 @Slf4j
 public class MemberController {
