@@ -31,6 +31,6 @@ public class JwtMemberDetailsService implements UserDetailsService {
     private UserDetails getUserDetails(Member member) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(member.getRole().name()));
-        return new User(member.getMemberId(), null, authorities);
+        return new User(member.getMemberId(), "", authorities);
     }
 }

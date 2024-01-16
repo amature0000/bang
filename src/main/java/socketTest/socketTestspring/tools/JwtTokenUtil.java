@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import socketTest.socketTestspring.exception.myExceptions.classes.InvalidJwtException;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
@@ -46,13 +47,17 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    public String getMemberId(String token) {
-        Claims claims = Jwts
-                .parserBuilder()
-                .setSigningKey(makeSecretKey()).build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.get(MEMBER).toString();
+    public String getMemberId(String token) throws InvalidJwtException {
+        try{
+            Claims claims = Jwts
+                    .parserBuilder()
+                    .setSigningKey(makeSecretKey()).build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.get(MEMBER).toString();
+        } catch (Exception e) {
+            throw new InvalidJwtException("Cannot find any member with this token");
+        }
     }
 
     // TODO : private 로 수정할 필요가 있음.
