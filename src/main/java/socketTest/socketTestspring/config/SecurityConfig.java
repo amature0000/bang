@@ -1,5 +1,6 @@
 package socketTest.socketTestspring.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,11 +10,21 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import socketTest.socketTestspring.filter.JwtFilter;
 
 @EnableWebSecurity
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+    @Bean
+    public BCryptPasswordEncoder encodePwd() {
+        return new BCryptPasswordEncoder(); //패스워드 인코딩
+    }
+
+    private final JwtFilter jwtFilter;
     //Http Security 설정
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -27,12 +38,15 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
-                        .requestMatchers("/api/**").permitAll()
-                        .requestMatchers("/ws").permitAll() //TODO 인가해야만 ws 업그레이드 가능하도록 바꾸기
-                )
+                        .requestMatchers("/api/v1/users/**").permitAll() //users
+                        .requestMatchers("/api/room/**").authenticated() //room
+                        .requestMatchers("/api/**").permitAll() //etc...
+                        .requestMatchers("/ws").authenticated() //stomp handshake
+                ) //TODO : authenticated() denied 시 아무 일도 일어나지 않음. 클라이언트에게 알림을 보내야 할 듯?
 
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //STATELESS 로 설정함 으로서 세션 사용 X ,JWT 토큰을 사용할 것이기 때문
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // authorization 이전에 jwtFilter 실행
                 .build();
     }
 }

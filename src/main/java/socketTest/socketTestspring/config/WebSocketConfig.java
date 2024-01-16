@@ -7,7 +7,6 @@ import org.springframework.web.socket.config.annotation.*;
 /**
  * WebSocket config 파일
  * 구독/발행 경로를 지정하고, websocket endpoint 를 설정
- * @author 주현수
  */
 @Configuration
 @EnableWebSocketMessageBroker

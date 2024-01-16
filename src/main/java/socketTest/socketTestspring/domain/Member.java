@@ -16,6 +16,7 @@ public class Member {
 
     @Column(nullable = false, unique = true)
     private String memberId;
+
     @Column(nullable = false)
     private String memberPassword;
 
@@ -23,23 +24,19 @@ public class Member {
     private String memberName;
 
     @Column
-    private String joinedRoomId;
-
-    public void setJoinedRoomId(String joinedRoomId) {
-        this.joinedRoomId = joinedRoomId;
-    }
+    @Enumerated(EnumType.STRING)
+    private MemberRole role;
 
     public Member(String memberId, String memberPassword, String memberName){
         this.memberId = memberId;
         this.memberPassword = memberPassword;
         this.memberName = memberName;
-        this.joinedRoomId = null;
+        this.role = MemberRole.ROLE_NOT_PERMITTED;
     }
 
     public Member(MemberJoinRequest memberJoinRequest){
         this.memberId = memberJoinRequest.getMemberId();
         this.memberPassword = memberJoinRequest.getMemberPassword();
         this.memberName = memberJoinRequest.getMemberName();
-        this.joinedRoomId = null;
     }
 }

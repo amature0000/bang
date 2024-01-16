@@ -6,7 +6,7 @@ import socketTest.socketTestspring.exception.myExceptions.GameRuleErrorCode;
 
 @Getter
 @AllArgsConstructor
-public class BangGameException extends RuntimeException{
+public class MyException extends RuntimeException{
     private final GameRuleErrorCode errorCode;
     private final String message;
 

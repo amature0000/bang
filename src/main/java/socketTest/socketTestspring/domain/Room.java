@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
-
+//TODO : memory domain 으로 변경 후 Map 추가. connected member 관리
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

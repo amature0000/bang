@@ -1,5 +1,6 @@
 package socketTest.socketTestspring.config;
 import io.micrometer.common.lang.NonNullApi;
+import lombok.AllArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -8,12 +9,15 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
+import socketTest.socketTestspring.tools.JwtTokenUtil;
 
 import java.util.Objects;
 
 @Component
 @NonNullApi
+@AllArgsConstructor
 public class WebSocketInterceptor implements ChannelInterceptor {
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -43,19 +47,10 @@ public class WebSocketInterceptor implements ChannelInterceptor {
 
         throw new IllegalStateException("Invalid operation. An unexpected command occurred during WebSocket connection.");
     }
-
+    //TODO : 만약 WebSocketSecurityConfig 로 인증된다면 필요없어짐.
     private void handleConnect(StompHeaderAccessor accessor) {
-        String token = accessor.getFirstNativeHeader("Authorization"); // client 로부터 Authorization 헤더로 전달받은 JWT 토큰
 
-        if (!isValidToken(token)) { // TODO : JWT 토큰을 이용한 인증 로직 구현 필요
-            throw new BadCredentialsException("Invalid or missing authentication token");
-        }
     }
-    /* 테스트 용 메소드.*/
-    private boolean isValidToken(String token) {
-        return true;
-    }
-    /**/
     private void handleDisconnect(StompHeaderAccessor accessor) {
         // DISCONNECT 요청 처리 로직
     }

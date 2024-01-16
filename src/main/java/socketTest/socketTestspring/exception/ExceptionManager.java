@@ -1,11 +1,7 @@
 package socketTest.socketTestspring.exception;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import socketTest.socketTestspring.exception.myExceptions.ErrorCode;
@@ -13,14 +9,15 @@ import socketTest.socketTestspring.exception.myExceptions.ErrorCode;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionManager {
-    @ExceptionHandler(BangGameException.class)
-    public ResponseEntity<?> bangGameExceptionHandler(BangGameException e){
+    @ExceptionHandler(MyException.class)
+    public ResponseEntity<?> bangGameExceptionHandler(MyException e){
         ErrorCode errorCode = e.getErrorCode();
         log.error(errorCode.getMessage());
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(MyResponse.error(errorCode.getMessage()));
     }
-
+// 정의된 예외 발생 시 핸들러. 미사용 메소드로 주석 처리하였음.
+    /*
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<?> dataIntegrityViolationExceptionHandler(DataIntegrityViolationException e){
         log.error(e.getMessage());
@@ -43,11 +40,12 @@ public class ExceptionManager {
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<?> IllegalStateException(BadCredentialsException e){
+    public ResponseEntity<?> illegalStateException(IllegalStateException e){
         log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(MyResponse.error(e.getMessage()));
     }
+     */
 }
 //Exception
 //BangGameException 이 Throw 되면 여기서 Handling 하게 됨.
