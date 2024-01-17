@@ -26,7 +26,8 @@ public class MemberService {
                 .ifPresent(member1 -> {
                     throw new MyException(GameRuleErrorCode.BAD_USER_ACCESS, "user Id is duplicated");
                 });
-        Member member = new Member(memberJoinRequest);
+        String encodedPwd = encoder.encode(memberJoinRequest.memberPassword());
+        Member member = new Member(memberJoinRequest.memberId(), encodedPwd, memberJoinRequest.memberName());
         memberRepository.save(member);
 
         return member;
