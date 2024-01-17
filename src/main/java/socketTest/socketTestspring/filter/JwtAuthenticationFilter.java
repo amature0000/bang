@@ -35,17 +35,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = extractJwtFromRequest(request);
         try {
-            if (token == null) throw new JwtNotFoundException("token does not exist in header");
+            if (token == null) throw new JwtNotFoundException("헤더에 토큰이 없습니다.");
             String memberId = jwtTokenUtil.getMemberId(token);
             log.info("get memberId : {}", memberId);
 
-            if (memberId == null) throw new InvalidJwtException("MemberId is null");
+            if (memberId == null) throw new InvalidJwtException("멤버 아이디가 없습니다.");
             UserDetails memberDetails = jwtMemberDetailsService.loadUserByUsername(memberId);
             log.info("created UserDetails : {}", memberDetails);
 
-            if (!jwtTokenUtil.validateToken(token, memberDetails)) throw new InvalidJwtException("Your token is invalid");
+            if (!jwtTokenUtil.validateToken(token, memberDetails)) throw new InvalidJwtException("옳바른 토큰이 아닙니다.");
 
-            log.info("your user info stored at Security Context");
+            log.info("유저 정보가 Security Context에 저장됩니다.");
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
                     = new UsernamePasswordAuthenticationToken(memberDetails, null, memberDetails.getAuthorities());
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

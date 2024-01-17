@@ -5,6 +5,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import socketTest.socketTestspring.domain.Member;
+import socketTest.socketTestspring.dto.member.join.MemberJoinRequest;
 import socketTest.socketTestspring.exception.MyException;
 import socketTest.socketTestspring.exception.myExceptions.GameRuleErrorCode;
 import socketTest.socketTestspring.repository.MemberRepository;
@@ -20,11 +21,12 @@ public class MemberService {
     private final JwtTokenUtil jwtTokenUtil;
 
     @Transactional
-    public Member join(Member member){
-        memberRepository.findByMemberId(member.getMemberId())
+    public Member join(MemberJoinRequest memberJoinRequest){
+        memberRepository.findByMemberId(memberJoinRequest.memberId())
                 .ifPresent(member1 -> {
                     throw new MyException(GameRuleErrorCode.BAD_USER_ACCESS, "user Id is duplicated");
                 });
+        Member member = new Member(memberJoinRequest);
         memberRepository.save(member);
 
         return member;

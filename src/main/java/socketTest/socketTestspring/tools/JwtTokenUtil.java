@@ -3,7 +3,6 @@ package socketTest.socketTestspring.tools;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 import socketTest.socketTestspring.exception.myExceptions.classes.InvalidJwtException;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
 import java.util.Date;
 
 @Slf4j
@@ -31,12 +29,12 @@ public class JwtTokenUtil {
     private String secretKey;
     @Value("${jwt.token.refresh}")
     private String refreshSecretKey;
-    SecretKeySpec secretKey1;
-    SecretKeySpec refreshSecretKey1;
-    // HS512 알고리즘을 사용하여 secretKey 이용해 서명
+    private SecretKeySpec secretKeySpec;
+    private SecretKeySpec refreshSecretKeySpec;
+
     protected void init() {
-        secretKey1 = new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName());
-        refreshSecretKey1 = new SecretKeySpec(refreshSecretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName());
+        secretKeySpec = new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName());
+        refreshSecretKeySpec = new SecretKeySpec(refreshSecretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName());
     }
 
     public String createToken(String memberId){
@@ -46,7 +44,7 @@ public class JwtTokenUtil {
                 .claim(MEMBER, memberId)
                 .setIssuedAt(new Date(now))//현재 시간
                 .setExpiration(new Date(now + EXPIRE_TIME))//현재 시간 + 유효 시간 = 만료 시간
-                .signWith(secretKey1)
+                .signWith(secretKeySpec)
                 .compact();
     }
 
@@ -54,7 +52,7 @@ public class JwtTokenUtil {
         try{
             Claims claims = Jwts
                     .parserBuilder()
-                    .setSigningKey(secretKey1).build()
+                    .setSigningKey(secretKeySpec).build()
                     .parseClaimsJws(token)
                     .getBody();
             return claims.get(MEMBER).toString();
@@ -64,10 +62,10 @@ public class JwtTokenUtil {
     }
 
     // TODO : private 로 수정할 필요가 있음.
-    public boolean isValidToken(String token) {
+    private boolean isValidToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(secretKey1).build()
+                    .setSigningKey(secretKeySpec).build()
                     .parseClaimsJws(token);
             return true;
         } catch(Exception e) {

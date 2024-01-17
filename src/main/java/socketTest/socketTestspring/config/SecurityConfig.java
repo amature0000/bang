@@ -19,10 +19,6 @@ import socketTest.socketTestspring.filter.JwtAuthenticationFilter;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    @Bean
-    public BCryptPasswordEncoder encodePwd() {
-        return new BCryptPasswordEncoder(); //패스워드 인코딩
-    }
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     //Http Security 설정
@@ -47,5 +43,10 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //STATELESS 로 설정함 으로서 세션 사용 X ,JWT 토큰을 사용할 것이기 때문
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // authorization 이전에 jwtFilter 실행
                 .build();
+    }
+    //Pwd 인코딩
+    @Bean
+    public BCryptPasswordEncoder encodedPwd(){
+        return new BCryptPasswordEncoder();
     }
 }

@@ -25,14 +25,14 @@ public class MemberController {
 
     @PostMapping("/join")
     public MyResponse<MemberJoinResponse> join(@RequestBody MemberJoinRequest memberJoinRequest){
-        Member join = memberService.join(memberJoinRequest.toEntity(encoder.encode(memberJoinRequest.getMemberPassword())));
-        MemberJoinResponse memberJoinResponse = new MemberJoinResponse(join);
+        Member newMember = memberService.join(memberJoinRequest);
+        MemberJoinResponse memberJoinResponse = new MemberJoinResponse(newMember.getMemberId(),newMember.getMemberPassword());
         return MyResponse.success(memberJoinResponse);
     }
 
     @PostMapping("/login")
     public MyResponse<MemberLoginResponse> login(@RequestBody MemberLoginRequest memberLoginRequest){
-        String token = memberService.login(memberLoginRequest.getMemberId(),memberLoginRequest.getMemberPassword());
+        String token = memberService.login(memberLoginRequest.memberId(), memberLoginRequest.memberPassword());
         return MyResponse.success(new MemberLoginResponse(token));
     }
 }

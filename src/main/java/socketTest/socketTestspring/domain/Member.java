@@ -35,8 +35,8 @@ public class Member {
     }
 
     public Member(MemberJoinRequest memberJoinRequest){
-        this.memberId = memberJoinRequest.getMemberId();
-        this.memberPassword = memberJoinRequest.getMemberPassword();
-        this.memberName = memberJoinRequest.getMemberName();
+        this.memberId = memberJoinRequest.memberId();
+        this.memberPassword = memberJoinRequest.memberPassword();
+        this.memberName = memberJoinRequest.memberName();
     }
 }
