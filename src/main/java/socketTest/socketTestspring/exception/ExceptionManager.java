@@ -14,7 +14,7 @@ public class ExceptionManager {
         ErrorCode errorCode = e.getErrorCode();
         log.error(errorCode.getMessage());
         return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(Response.error(errorCode.getMessage()));
+                .body(MyResponse.error(errorCode.getMessage()));
     }
 }
 //Exception

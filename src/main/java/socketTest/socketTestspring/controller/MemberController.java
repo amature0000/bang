@@ -11,7 +11,7 @@ import socketTest.socketTestspring.dto.member.join.MemberJoinRequest;
 import socketTest.socketTestspring.dto.member.join.MemberJoinResponse;
 import socketTest.socketTestspring.dto.member.login.MemberLoginRequest;
 import socketTest.socketTestspring.dto.member.login.MemberLoginResponse;
-import socketTest.socketTestspring.exception.Response;
+import socketTest.socketTestspring.exception.MyResponse;
 import socketTest.socketTestspring.service.MemberService;
 
 @RestController
@@ -22,15 +22,15 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/join")
-    public Response<MemberJoinResponse> join(@RequestBody MemberJoinRequest memberJoinRequest){
+    public MyResponse<MemberJoinResponse> join(@RequestBody MemberJoinRequest memberJoinRequest){
         Member newMember = memberService.join(memberJoinRequest);
         MemberJoinResponse memberJoinResponse = new MemberJoinResponse(newMember.getMemberId(),newMember.getMemberPassword());
-        return Response.success(memberJoinResponse);
+        return MyResponse.success(memberJoinResponse);
     }
 
     @PostMapping("/login")
-    public Response<MemberLoginResponse> login(@RequestBody MemberLoginRequest memberLoginRequest){
+    public MyResponse<MemberLoginResponse> login(@RequestBody MemberLoginRequest memberLoginRequest){
         String token = memberService.login(memberLoginRequest.memberId(), memberLoginRequest.memberPassword());
-        return Response.success(new MemberLoginResponse(token));
+        return MyResponse.success(new MemberLoginResponse(token));
     }
 }
