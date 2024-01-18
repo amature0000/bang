@@ -31,7 +31,7 @@ public class Member {
         this.memberId = memberId;
         this.memberPassword = memberPassword;
         this.memberName = memberName;
-        this.role = MemberRole.ROLE_NOT_PERMITTED;
+        this.role = MemberRole.ROLE_USER;
     }
 
     public Member(MemberJoinRequest memberJoinRequest){
