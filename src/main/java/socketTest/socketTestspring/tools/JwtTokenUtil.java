@@ -61,7 +61,7 @@ public class JwtTokenUtil {
                     .getBody();
             return claims.get(MEMBER).toString();
         } catch(ExpiredJwtException e) {
-            log.warn("expired Jwt token. Need to refresh");
+            log.error("expired Jwt token. Need to refresh");
             throw e;
         } catch (Exception e) {
             log.error("Cannot find any member with this token");
