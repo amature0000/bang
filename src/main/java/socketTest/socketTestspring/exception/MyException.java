@@ -2,12 +2,12 @@ package socketTest.socketTestspring.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import socketTest.socketTestspring.exception.myExceptions.GameRuleErrorCode;
+import socketTest.socketTestspring.exception.myExceptions.ErrorCode;
 
 @Getter
 @AllArgsConstructor
 public class MyException extends RuntimeException{
-    private final GameRuleErrorCode errorCode;
+    private final ErrorCode errorCode;
     private final String message;
 
     @Override
