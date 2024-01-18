@@ -16,36 +16,6 @@ public class ExceptionManager {
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(MyResponse.error(errorCode.getMessage()));
     }
-// 정의된 예외 발생 시 핸들러. 미사용 메소드로 주석 처리하였음.
-    /*
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<?> dataIntegrityViolationExceptionHandler(DataIntegrityViolationException e){
-        log.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(MyResponse.error(e.getMessage()));
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<?> entityNotFoundExceptionHandler(EntityNotFoundException e){
-        log.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(MyResponse.error(e.getMessage()));
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<?> badCredentialsExceptionHandler(BadCredentialsException e){
-        log.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(MyResponse.error(e.getMessage()));
-    }
-
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<?> illegalStateException(IllegalStateException e){
-        log.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(MyResponse.error(e.getMessage()));
-    }
-     */
 }
 //Exception
 //BangGameException 이 Throw 되면 여기서 Handling 하게 됨.

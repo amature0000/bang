@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,18 +14,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import socketTest.socketTestspring.filter.JwtFilter;
+import socketTest.socketTestspring.filter.JwtAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    @Bean
-    public BCryptPasswordEncoder encodePwd() {
-        return new BCryptPasswordEncoder(); //패스워드 인코딩
-    }
 
-    private final JwtFilter jwtFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     //Http Security 설정
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,15 +35,19 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
-                        .requestMatchers("/api/v1/users/**").permitAll() //users
-                        .requestMatchers("/api/room/**").authenticated() //room
-                        .requestMatchers("/api/**").permitAll() //etc...
-                        .requestMatchers("/ws").authenticated() //stomp handshake
+                        .requestMatchers("api/users/login","api/users/join").permitAll()
+                        .requestMatchers(HttpMethod.POST,"api/**").authenticated() //api 경로의 post 방식은 인가 필요
+                        .requestMatchers("ws").authenticated() //stomp handshake
                 ) //TODO : authenticated() denied 시 아무 일도 일어나지 않음. 클라이언트에게 알림을 보내야 할 듯?
 
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //STATELESS 로 설정함 으로서 세션 사용 X ,JWT 토큰을 사용할 것이기 때문
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // authorization 이전에 jwtFilter 실행
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // authorization 이전에 jwtFilter 실행
                 .build();
+    }
+    //Pwd 인코딩
+    @Bean
+    public BCryptPasswordEncoder encodedPwd(){
+        return new BCryptPasswordEncoder();
     }
 }
