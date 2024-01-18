@@ -33,4 +33,9 @@ public class MemberController {
         String token = memberService.login(memberLoginRequest.memberId(), memberLoginRequest.memberPassword());
         return MyResponse.success(new MemberLoginResponse(token));
     }
+
+    @PostMapping("/refresh")
+    public String refresh(@RequestBody MemberLoginRequest memberLoginRequest){
+        return "미구현 : refresh 요청 경로";
+    }
 }

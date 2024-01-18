@@ -38,7 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("api/users/login","api/users/join").permitAll()
                         .requestMatchers(HttpMethod.POST,"api/**").authenticated() //api 경로의 post 방식은 인가 필요
                         .requestMatchers("ws").authenticated() //stomp handshake
-                ) //TODO : authenticated() denied 시 아무 일도 일어나지 않음. 클라이언트에게 알림을 보내야 할 듯?
+                )
 
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //STATELESS 로 설정함 으로서 세션 사용 X ,JWT 토큰을 사용할 것이기 때문

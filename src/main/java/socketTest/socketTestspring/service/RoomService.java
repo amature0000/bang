@@ -10,7 +10,7 @@ import socketTest.socketTestspring.dto.room.create.RoomCreateResponse;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteRequest;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteResponse;
 import socketTest.socketTestspring.exception.MyException;
-import socketTest.socketTestspring.exception.myExceptions.GameRuleErrorCode;
+import socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode;
 import socketTest.socketTestspring.repository.RoomRepository;
 
 
@@ -30,10 +30,10 @@ public class RoomService {
     @Transactional
     public RoomDeleteResponse deleteRoom(RoomDeleteRequest roomDeleteRequest) {
         Room deleteRoom = roomRepository.findByRoomId(roomDeleteRequest.roomId())
-                .orElseThrow(() -> new MyException(GameRuleErrorCode.BAD_ROOM_ACCESS, "Cannot find any room with this roomId"));
+                .orElseThrow(() -> new MyException(ServerConnectionErrorCode.BAD_ROOM_ACCESS, "Cannot find any room with this roomId"));
 
         String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        if(!memberId.equals(deleteRoom.getOwnerMemberId())) throw new MyException(GameRuleErrorCode.BAD_USER_ACCESS, "This user is not the room owner");
+        if(!memberId.equals(deleteRoom.getOwnerMemberId())) throw new MyException(ServerConnectionErrorCode.BAD_USER_ACCESS, "This user is not the room owner");
 
         roomRepository.delete(deleteRoom);
         return new RoomDeleteResponse("room deleted");
