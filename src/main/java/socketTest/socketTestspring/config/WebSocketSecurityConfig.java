@@ -1,27 +1,26 @@
 package socketTest.socketTestspring.config;
 
-import org.springframework.context.annotation.Bean;
+
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.Message;
-import org.springframework.security.authorization.AuthorizationManager;
-import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
+import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
+import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 
 // 참고 : https://docs.spring.io/spring-security/reference/servlet/integrations/websocket.html
-// TODO : 아직 작동 하는지 테스트 하지 않았음. 미구현 상태, 작동 확인 시 WebSocketConfig 파일과 병합
+// CSRF disable 을 위해서 deprecated 된 버전을 사용해야 함(최신버전 에서는 지원하지 않음)
 @Configuration
-public class WebSocketSecurityConfig {
-    @Bean
-    public MessageMatcherDelegatingAuthorizationManager.Builder messagesBuilder() {
-        return MessageMatcherDelegatingAuthorizationManager.builder();
+public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+
+    @Override
+    protected void configureInbound(MessageSecurityMetadataSourceRegistry message) {
+        message
+                .nullDestMatcher().permitAll() //Jwt validation at WebSocketInterceptor
+                .simpSubscribeDestMatchers("/sub/**").authenticated()
+                .simpDestMatchers("/pub/**").authenticated()
+                .anyMessage().denyAll();
     }
 
-    @Bean
-    public AuthorizationManager<Message<?>> messageAuthorizationManager(MessageMatcherDelegatingAuthorizationManager.Builder messages) {
-        messages
-                .simpSubscribeDestMatchers("/sub/**").permitAll()
-                .simpDestMatchers("/pub/**").permitAll()
-                .anyMessage().denyAll();
-
-        return messages.build();
+    @Override
+    protected boolean sameOriginDisabled() {
+        return true;
     }
 }

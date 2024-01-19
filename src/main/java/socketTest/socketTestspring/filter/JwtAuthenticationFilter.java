@@ -76,7 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     public void filterExceptionHandler(HttpServletResponse response, ErrorCode error) {
-        log.error("{} error : {}", error.getHttpStatus(), error.getMessage());
+        log.error("{} : {}", error.getHttpStatus(), error.getMessage());
         response.setStatus(error.getHttpStatus().value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
