@@ -56,10 +56,10 @@ public class RoomService {
         return new RoomDeleteResponse("room deleted");
     }
 
-    // TODO : roomJoinRequest 에서 memberId를 그대로 받아오고 있음. 보안을 위해 memberId 대신 현재 접속중인 사용자 id만 request 로 날릴 수 있도록 수정 필요.
     public RoomJoinResponse joinRoom(RoomJoinRequest roomJoinRequest) {
         Room joinRoom = findOne(roomJoinRequest.roomId()); // Possible exception: MyException may be thrown.
-        MemberInfo memberInfo = new MemberInfo(roomJoinRequest.memberId());
+        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        MemberInfo memberInfo = new MemberInfo(memberId);
 
         boolean result = roomRepository.joinRoom(joinRoom, memberInfo);
         if (!result) throw new MyException(BAD_ROOM_ACCESS, "Cannot join the room");
