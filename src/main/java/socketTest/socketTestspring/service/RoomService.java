@@ -3,39 +3,66 @@ package socketTest.socketTestspring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import socketTest.socketTestspring.domain.MemberInfo;
 import socketTest.socketTestspring.domain.Room;
+import socketTest.socketTestspring.dto.room.RoomDto;
 import socketTest.socketTestspring.dto.room.create.RoomCreateRequest;
 import socketTest.socketTestspring.dto.room.create.RoomCreateResponse;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteRequest;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteResponse;
+import socketTest.socketTestspring.dto.room.join.RoomJoinRequest;
+import socketTest.socketTestspring.dto.room.join.RoomJoinResponse;
 import socketTest.socketTestspring.exception.MyException;
-import socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode;
-import socketTest.socketTestspring.repository.RoomRepository;
+import socketTest.socketTestspring.repository.MemoryRoomRepository;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode.BAD_ROOM_ACCESS;
 
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class RoomService {
-    private final RoomRepository roomRepository;
+    private final MemoryRoomRepository roomRepository;
 
-    @Transactional
-    public RoomCreateResponse createRoom(RoomCreateRequest roomCreateRequest) {
-        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        Room created = roomRepository.save(new Room(roomCreateRequest.roomName(), memberId));
-        return new RoomCreateResponse(created.getRoomId(), created.getRoomName());
+    public List<RoomDto> roomList() {
+        List<Room> roomList = new ArrayList<>(roomRepository.findAll().values());
+        List<RoomDto> roomDtoList = new ArrayList<>(roomList.stream()
+                .map(RoomDto::fromRoom)
+                .toList());
+        Collections.reverse(roomDtoList);
+        return roomDtoList;
     }
 
-    @Transactional
-    public RoomDeleteResponse deleteRoom(RoomDeleteRequest roomDeleteRequest) {
-        Room deleteRoom = roomRepository.findByRoomId(roomDeleteRequest.roomId())
-                .orElseThrow(() -> new MyException(ServerConnectionErrorCode.BAD_ROOM_ACCESS, "Cannot find any room with this roomId"));
+    public Room findOne(String roomId) {
+        return roomRepository.findByRoomId(roomId).orElseThrow(() ->
+                new MyException(BAD_ROOM_ACCESS, "No rooms found")
+        );
+    }
 
+    public RoomCreateResponse createRoom(RoomCreateRequest roomCreateRequest) {
         String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        if(!memberId.equals(deleteRoom.getOwnerMemberId())) throw new MyException(ServerConnectionErrorCode.BAD_USER_ACCESS, "This user is not the room owner");
+        Room room = new Room(roomCreateRequest.roomName(), memberId);
+        roomRepository.saveRoom(room);
+        return new RoomCreateResponse(room.getRoomId(), room.getRoomName());
+    }
 
-        roomRepository.delete(deleteRoom);
+    public RoomDeleteResponse deleteRoom(RoomDeleteRequest roomDeleteRequest) {
+        roomRepository.deleteByRoomId(roomDeleteRequest.roomId()).orElseThrow(() ->
+                new MyException(BAD_ROOM_ACCESS, "No rooms found")
+        );
         return new RoomDeleteResponse("room deleted");
+    }
+
+    // TODO : roomJoinRequest 에서 memberId를 그대로 받아오고 있음. 보안을 위해 memberId 대신 현재 접속중인 사용자 id만 request 로 날릴 수 있도록 수정 필요.
+    public RoomJoinResponse joinRoom(RoomJoinRequest roomJoinRequest) {
+        Room joinRoom = findOne(roomJoinRequest.roomId()); // Possible exception: MyException may be thrown.
+        MemberInfo memberInfo = new MemberInfo(roomJoinRequest.memberId());
+
+        boolean result = roomRepository.joinRoom(joinRoom, memberInfo);
+        if (!result) throw new MyException(BAD_ROOM_ACCESS, "Cannot join the room");
+        return new RoomJoinResponse("joined"); // TODO : response 문에 추가할 만한 데이터가 있으면 추가하기.
     }
 }

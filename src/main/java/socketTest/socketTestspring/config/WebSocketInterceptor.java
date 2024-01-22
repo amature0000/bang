@@ -1,56 +1,62 @@
 package socketTest.socketTestspring.config;
+
 import io.micrometer.common.lang.NonNullApi;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
-import socketTest.socketTestspring.tools.JwtTokenUtil;
 
 import java.util.Objects;
-
+// 참고 : https://github.com/U-Zo/baesinzer/blob/master/server/src/main/java/projectw/baesinzer/controller/MessageController.java#L29
+@Slf4j
 @Component
 @NonNullApi
 @AllArgsConstructor
 public class WebSocketInterceptor implements ChannelInterceptor {
-    private final JwtTokenUtil jwtTokenUtil;
-
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-        assert accessor != null;
-        System.out.println(accessor);
+        
+        log.info("{}", accessor);
+        if(accessor == null) {
+            throw new IllegalStateException("No message found.");
+        }
 
-        if(Objects.equals(accessor.getCommand(), StompCommand.CONNECT)) {
+        StompCommand command = accessor.getCommand();
+        if(Objects.equals(command, StompCommand.CONNECT)) {
             handleConnect(accessor);
             return message;
         }
 
-        if (Objects.equals(accessor.getCommand(), StompCommand.DISCONNECT)) {
+        if (Objects.equals(command, StompCommand.DISCONNECT)) {
             handleDisconnect(accessor);
             return message;
         }
 
-        if (Objects.equals(accessor.getCommand(), StompCommand.SUBSCRIBE)) {
+        if (Objects.equals(command, StompCommand.SUBSCRIBE)) {
             handleSubscribe(accessor);
             return message;
         }
 
-        if (Objects.equals(accessor.getCommand(), StompCommand.SEND)) {
+        if (Objects.equals(command, StompCommand.SEND)) {
             handleSend(accessor);
             return message;
         }
 
         throw new IllegalStateException("Invalid operation. An unexpected command occurred during WebSocket connection.");
     }
-    //TODO : 만약 WebSocketSecurityConfig 로 인증된다면 필요없어짐.
+
     private void handleConnect(StompHeaderAccessor accessor) {
+        // CONNECT 요청 처리 로직
+        // Room에 접속
 
     }
+
     private void handleDisconnect(StompHeaderAccessor accessor) {
         // DISCONNECT 요청 처리 로직
     }

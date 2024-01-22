@@ -1,33 +1,26 @@
 package socketTest.socketTestspring.domain;
 
-import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 //TODO : memory domain 으로 변경 후 Map 추가. connected member 관리
-@Entity
+
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
 public class Room {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column
+    public static int MAX_JOINED = 7; // 방 최대 인원
     private String roomId; // 채팅방 아이디
-
-    @Column(nullable = false)
     private String roomName; // 채팅방 이름
-
-    @Column(nullable = false)
     private String ownerMemberId;
+    private Set<MemberInfo> joinedMembers;
 
     public Room(String roomName, String memberId){
         this.roomName = roomName;
         this.roomId = UUID.randomUUID().toString();
         this.ownerMemberId = memberId;
+        this.joinedMembers = new HashSet<>();
     }
 }
-

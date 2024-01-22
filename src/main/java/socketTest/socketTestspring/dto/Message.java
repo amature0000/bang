@@ -8,6 +8,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Message {
+    public enum MessageType {
+        ENTER, TALK, QUIT
+    }
+
     private MessageType type;
     private String sender;
     private String channelId;
