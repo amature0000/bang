@@ -17,4 +17,3 @@ public class MyResponse<T> {
         return new MyResponse<>("SUCCESS", result);
     }
 }
-//JSON 으로 ErrorCode 와 ErrorMessage 를 보기 위해 Response 생성

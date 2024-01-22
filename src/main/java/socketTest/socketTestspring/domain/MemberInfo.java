@@ -28,5 +28,5 @@ public class MemberInfo {
     }
 
     private int hands;
-    //게임 role, 손의 카드 수 등등 게임 정보를 담는다.
+    //etc...
 }

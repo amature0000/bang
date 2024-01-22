@@ -3,15 +3,12 @@ package socketTest.socketTestspring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import socketTest.socketTestspring.domain.MemberInfo;
 import socketTest.socketTestspring.domain.Room;
 import socketTest.socketTestspring.dto.room.RoomDto;
 import socketTest.socketTestspring.dto.room.create.RoomCreateRequest;
 import socketTest.socketTestspring.dto.room.create.RoomCreateResponse;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteRequest;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteResponse;
-import socketTest.socketTestspring.dto.room.join.RoomJoinRequest;
-import socketTest.socketTestspring.dto.room.join.RoomJoinResponse;
 import socketTest.socketTestspring.exception.MyException;
 import socketTest.socketTestspring.repository.MemoryRoomRepository;
 
@@ -50,19 +47,13 @@ public class RoomService {
     }
 
     public RoomDeleteResponse deleteRoom(RoomDeleteRequest roomDeleteRequest) {
+        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(!findOne(roomDeleteRequest.roomId()).getOwnerMemberId().equals(memberId)) // Possible exception: MyException may be thrown.
+            throw new MyException(BAD_ROOM_ACCESS, "You are not the owner of the room");
+
         roomRepository.deleteByRoomId(roomDeleteRequest.roomId()).orElseThrow(() ->
                 new MyException(BAD_ROOM_ACCESS, "No rooms found")
         );
         return new RoomDeleteResponse("room deleted");
-    }
-
-    public RoomJoinResponse joinRoom(RoomJoinRequest roomJoinRequest) {
-        Room joinRoom = findOne(roomJoinRequest.roomId()); // Possible exception: MyException may be thrown.
-        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        MemberInfo memberInfo = new MemberInfo(memberId);
-
-        boolean result = roomRepository.joinRoom(joinRoom, memberInfo);
-        if (!result) throw new MyException(BAD_ROOM_ACCESS, "Cannot join the room");
-        return new RoomJoinResponse("joined"); // TODO : response 문에 추가할 만한 데이터가 있으면 추가하기.
     }
 }

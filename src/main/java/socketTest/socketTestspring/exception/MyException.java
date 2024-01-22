@@ -6,7 +6,7 @@ import socketTest.socketTestspring.exception.myExceptions.ErrorCode;
 
 @Getter
 @AllArgsConstructor
-public class MyException extends RuntimeException{
+public class MyException extends RuntimeException {
     private final ErrorCode errorCode;
     private final String message;
 

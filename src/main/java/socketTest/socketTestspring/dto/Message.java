@@ -17,7 +17,7 @@ public class Message {
     private String channelId;
     private String data;
 }
-/*
+/* example
 {
     "type" : "ENTER",
     "sender" : "senderName",

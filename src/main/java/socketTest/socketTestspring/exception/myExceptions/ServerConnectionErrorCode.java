@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 public enum ServerConnectionErrorCode implements ErrorCode {
     //GAME RULES
     BAD_USER_ACCESS(HttpStatus.BAD_REQUEST, "잘못된 유저의 접근입니다"),
-    BAD_ROOM_ACCESS(HttpStatus.BAD_REQUEST, "잘못된 방의 접근입니다");
+    BAD_ROOM_ACCESS(HttpStatus.BAD_REQUEST, "잘못된 방의 접근입니다"),
+    BAD_STOMP_ACCESS(HttpStatus.BAD_REQUEST, "잘못된 메세지의 접근입니다");
 
     private final HttpStatus httpStatus;
     private final String message;

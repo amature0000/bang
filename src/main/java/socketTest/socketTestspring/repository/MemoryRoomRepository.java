@@ -17,12 +17,12 @@ public class MemoryRoomRepository {
         return roomMap;
     }
 
-    public Optional<Room> findByRoomId(String roomId) {
-        return Optional.ofNullable(roomMap.get(roomId));
-    }
-
     public void saveRoom(Room room) {
         roomMap.put(room.getRoomId(), room);
+    }
+
+    public Optional<Room> findByRoomId(String roomId) {
+        return Optional.ofNullable(roomMap.get(roomId));
     }
 
     public Optional<Room> deleteByRoomId(String roomId) {

@@ -11,8 +11,6 @@ import socketTest.socketTestspring.dto.room.create.RoomCreateRequest;
 import socketTest.socketTestspring.dto.room.create.RoomCreateResponse;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteRequest;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteResponse;
-import socketTest.socketTestspring.dto.room.join.RoomJoinRequest;
-import socketTest.socketTestspring.dto.room.join.RoomJoinResponse;
 import socketTest.socketTestspring.exception.MyResponse;
 import socketTest.socketTestspring.service.RoomService;
 
@@ -42,11 +40,5 @@ public class RoomController {
     public MyResponse<RoomDeleteResponse> deleteRoom(@RequestBody RoomDeleteRequest roomDeleteRequest){
         RoomDeleteResponse roomDeleteResponse = roomService.deleteRoom(roomDeleteRequest);
         return MyResponse.success(roomDeleteResponse);
-    }
-
-    @PostMapping("/join")
-    public MyResponse<RoomJoinResponse> joinRoom(@RequestBody RoomJoinRequest roomJoinRequest) {
-        RoomJoinResponse roomJoinResponse = roomService.joinRoom(roomJoinRequest);
-        return MyResponse.success(roomJoinResponse);
     }
 }

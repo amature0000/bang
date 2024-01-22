@@ -22,4 +22,8 @@ public class MessageController {
         // TODO : Service 단에서 메세지 처리 후 발송
         simpMessageSendingOperations.convertAndSend("/sub/channel/" + message.getChannelId(), message);
     }
+    @MessageMapping("error")
+    public void errorMessage(Message message) {
+        simpMessageSendingOperations.convertAndSend("/topic/error", message);
+    }
 }
