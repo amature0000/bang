@@ -15,9 +15,9 @@ import socketTest.socketTestspring.dto.room.join.RoomJoinResponse;
 import socketTest.socketTestspring.exception.MyException;
 import socketTest.socketTestspring.repository.MemoryRoomRepository;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode.BAD_ROOM_ACCESS;
 
@@ -28,10 +28,10 @@ public class RoomService {
     private final MemoryRoomRepository roomRepository;
 
     public List<RoomDto> roomList() {
-        List<Room> roomList = new ArrayList<>(roomRepository.findAll().values());
-        List<RoomDto> roomDtoList = new ArrayList<>(roomList.stream()
+        List<RoomDto> roomDtoList = roomRepository.findAll().values().stream()
                 .map(RoomDto::fromRoom)
-                .toList());
+                .collect(Collectors.toList());
+
         Collections.reverse(roomDtoList);
         return roomDtoList;
     }
