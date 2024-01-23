@@ -1,5 +1,6 @@
 package socketTest.socketTestspring.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import socketTest.socketTestspring.domain.Member;
+import socketTest.socketTestspring.dto.TokenDto;
 import socketTest.socketTestspring.dto.member.join.MemberJoinRequest;
 import socketTest.socketTestspring.dto.member.join.MemberJoinResponse;
 import socketTest.socketTestspring.dto.member.login.MemberLoginRequest;
@@ -29,13 +31,12 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public MyResponse<MemberLoginResponse> login(@RequestBody MemberLoginRequest memberLoginRequest){
-        String token = memberService.login(memberLoginRequest.memberId(), memberLoginRequest.memberPassword());
+    public MyResponse<MemberLoginResponse> login(@RequestBody MemberLoginRequest memberLoginRequest, HttpServletResponse response){
+        TokenDto token = memberService.login(memberLoginRequest.memberId(), memberLoginRequest.memberPassword());
+        response.addHeader("Access_Token", token.accessToken());
+        response.addHeader("Refresh_Token", token.refreshToken());
         return MyResponse.success(new MemberLoginResponse(token));
     }
 
-    @PostMapping("/refresh")
-    public String refresh(@RequestBody MemberLoginRequest memberLoginRequest){
-        return "미구현 : refresh 요청 경로";
-    }
+
 }
