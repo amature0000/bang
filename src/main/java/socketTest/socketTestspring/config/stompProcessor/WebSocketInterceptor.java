@@ -29,39 +29,34 @@ public class WebSocketInterceptor implements ChannelInterceptor {
         log.info("accessor :\n{}", accessor);
 
         StompCommand command = accessor.getCommand();
+        /*
         if (Objects.equals(command, StompCommand.CONNECT)) {
             handleConnect(accessor);
-            return message;
         }
+        */
 
         if (Objects.equals(command, StompCommand.DISCONNECT)) {
             handleDisconnect(accessor);
-            return message;
         }
-
         if (Objects.equals(command, StompCommand.SUBSCRIBE)) {
             handleSubscribe(accessor);
-            return message;
         }
 
         if (Objects.equals(command, StompCommand.SEND)) {
             handleSend(accessor);
-            return message;
         }
-
-        throw new IllegalStateException("Invalid operation. An unexpected command occurred during WebSocket connection.");
+        return message;
     }
 
-    // MessageDeliveryException 만을 발생시켜야 하며, 구분은 안의 String 으로 한다. (예 : SEND 에서 예외 발생 시 "SEND"를 담음)
-
+    // MessageDeliveryException 만을 발생시켜야 하며, 구분은 안의 String 으로 한다.
+    /*
     private void handleConnect(StompHeaderAccessor accessor) throws MessageDeliveryException {
         // CONNECT 요청 처리 로직
-        // TODO : 방 join 요청 날리기 -> 실패 시 Exception
     }
-
+    */
     private void handleDisconnect(StompHeaderAccessor accessor) throws MessageDeliveryException {
         // DISCONNECT 요청 처리 로직
-        // TODO : 방에서 탈퇴하는 요청 날리기
+        // TODO : 접속중인 방들로부터 탈퇴 처리를 해야 할까?
     }
 
     private void handleSubscribe(StompHeaderAccessor accessor) throws MessageDeliveryException {
