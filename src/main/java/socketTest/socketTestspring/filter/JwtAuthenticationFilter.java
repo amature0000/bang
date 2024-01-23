@@ -20,11 +20,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import socketTest.socketTestspring.exception.MyResponse;
 import socketTest.socketTestspring.exception.myExceptions.ErrorCode;
-import socketTest.socketTestspring.exception.myExceptions.JwtErrorCode;
 import socketTest.socketTestspring.service.JwtMemberDetailsService;
 import socketTest.socketTestspring.tools.JwtTokenUtil;
 
 import java.io.IOException;
+
+import static socketTest.socketTestspring.exception.myExceptions.JwtErrorCode.*;
 
 // Transactional 추가 시 오류 발생. 참고 : https://stackoverflow.com/questions/60267832/nullpointerexception-spring-security-filter-failed
 @Slf4j
@@ -38,13 +39,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String servletPath = request.getServletPath();
-        if (servletPath.equals("/api/users/login") || servletPath.equals("/api/users/join")) { //early return logic
+        if (servletPath.equals("/api/users/login") || servletPath.equals("/api/users/join")|| servletPath.equals("/ws")) { //early return logic
             filterChain.doFilter(request, response);
             return;
         }
         String token = extractJwtFromRequest(request);
         if (token == null) {
-            filterExceptionHandler(response, JwtErrorCode.TOKEN_NOT_EXIST);
+            filterExceptionHandler(response, TOKEN_NOT_EXIST);
             return;
         }
         try {
@@ -55,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("created UserDetails : {}", memberDetails); // memberDetails must not be null
 
             if (!jwtTokenUtil.validateToken(token, memberDetails)) {
-                filterExceptionHandler(response, JwtErrorCode.BAD_TOKEN);
+                filterExceptionHandler(response, BAD_TOKEN);
                 return;
             }
 
@@ -68,10 +69,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
         catch(ExpiredJwtException e) {
-            filterExceptionHandler(response, JwtErrorCode.TOKEN_EXPIRED);
+            filterExceptionHandler(response, TOKEN_EXPIRED);
         }
         catch(UsernameNotFoundException e) {
-            filterExceptionHandler(response, JwtErrorCode.BAD_TOKEN);
+            filterExceptionHandler(response, BAD_TOKEN);
         }
     }
 

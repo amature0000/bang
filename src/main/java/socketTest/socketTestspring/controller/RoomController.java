@@ -2,13 +2,19 @@ package socketTest.socketTestspring.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import socketTest.socketTestspring.dto.room.RoomDto;
 import socketTest.socketTestspring.dto.room.create.RoomCreateRequest;
 import socketTest.socketTestspring.dto.room.create.RoomCreateResponse;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteRequest;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteResponse;
 import socketTest.socketTestspring.exception.MyResponse;
 import socketTest.socketTestspring.service.RoomService;
+
+import java.util.List;
 
 //방 생성 및 조회 관련 API 통신
 
@@ -18,6 +24,11 @@ import socketTest.socketTestspring.service.RoomService;
 @RequestMapping("/api/room")
 public class RoomController {
     private final RoomService roomService;
+
+    @PostMapping("/list")
+    public List<RoomDto> listRoom(){
+        return roomService.roomList();
+    }
 
     @PostMapping("/new")
     public MyResponse<RoomCreateResponse> createRoom(@RequestBody RoomCreateRequest roomCreateRequest){
