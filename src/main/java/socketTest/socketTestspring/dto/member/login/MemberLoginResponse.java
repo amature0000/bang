@@ -1,4 +1,6 @@
 package socketTest.socketTestspring.dto.member.login;
 
-public record MemberLoginResponse(String token) {
+import socketTest.socketTestspring.dto.TokenDto;
+
+public record MemberLoginResponse(TokenDto token) {
 }

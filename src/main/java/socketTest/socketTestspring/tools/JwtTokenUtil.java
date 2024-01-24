@@ -5,25 +5,31 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import socketTest.socketTestspring.domain.RefreshToken;
+import socketTest.socketTestspring.dto.TokenDto;
+import socketTest.socketTestspring.repository.RefreshTokenRepository;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
+import java.util.Optional;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtTokenUtil {
-
-    //token expiration time
+    private final RefreshTokenRepository refreshTokenRepository;
     public static final long EXPIRE_TIME = 60 * 60 * 1000; //1시간
     public static final long REFRESH_EXPIRE_TIME = 24 * 60 * 60 * 1000; //24시간
-    private static final long REFRESH_TIME = 24 * 60 * 60 * 1000 / 4; // 6시간
-
     //token claim key
     private static final String MEMBER = "memberId";
+    public static final String ACCESS_TOKEN = "Access_Token";
+    public static final String REFRESH_TOKEN = "Refresh_Token";
 
     //token secret key
     @Value("${jwt.token.secret.access}")
@@ -40,10 +46,14 @@ public class JwtTokenUtil {
         secretKeySpec = new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName());
         refreshSecretKeySpec = new SecretKeySpec(refreshSecretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName());
     }
-
-    public String createToken(String memberId){
+    public String getHeaderToken(HttpServletRequest request, String type){
+        return type.equals("Access") ? request.getHeader(ACCESS_TOKEN) : request.getHeader(REFRESH_TOKEN);
+    }
+    public TokenDto createAllToken(String memberId){
+        return new TokenDto(createAccessToken(memberId),createRefreshToken(memberId));
+    }
+    public String createAccessToken(String memberId){
         long now = System.currentTimeMillis();
-
         return Jwts.builder()
                 .claim(MEMBER, memberId)
                 .setIssuedAt(new Date(now))
@@ -51,12 +61,22 @@ public class JwtTokenUtil {
                 .signWith(secretKeySpec)
                 .compact();
     }
+    public String createRefreshToken(String memberId){
+        long now = System.currentTimeMillis();
+        return Jwts.builder()
+                .claim(MEMBER,memberId)
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now+REFRESH_EXPIRE_TIME))
+                .signWith(refreshSecretKeySpec)
+                .compact();
+    }
 
-    public String getMemberId(String token) throws ExpiredJwtException {
+    public String getMemberId(String token, String type) throws ExpiredJwtException {
+        SecretKeySpec secretKey  = type.equals("Access") ? secretKeySpec : refreshSecretKeySpec;
         try{
             Claims claims = Jwts
                     .parserBuilder()
-                    .setSigningKey(secretKeySpec).build()
+                    .setSigningKey(secretKey).build()
                     .parseClaimsJws(token)
                     .getBody();
             return claims.get(MEMBER).toString();
@@ -68,26 +88,14 @@ public class JwtTokenUtil {
             return null;
         }
     }
-
-    /**
-     * @deprecated Currently not in use. {@link JwtTokenUtil#getMemberId(String)} contains this method logically.
-     */
-    private boolean isValidToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(secretKeySpec).build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch(ExpiredJwtException e) {
-            log.warn("expired Jwt token. Need to refresh");
-            return false;
-        } catch(Exception e) {
-            log.error(e.getMessage());
-            return false;
-        }
+    public Boolean refreshTokenValidation(String refreshToken1) throws ExpiredJwtException {
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByMemberId(getMemberId(refreshToken1, "Refresh"));
+        return refreshToken.isPresent() && refreshToken1.equals(refreshToken.get().getRefreshToken());
     }
-
-    public boolean validateToken(String token, UserDetails userDetails) {
-        return (getMemberId(token).equals(userDetails.getUsername()));
+    public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
+        response.setHeader("Refresh_Token", refreshToken);
+    }
+    public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
+        response.setHeader("Access_Token", accessToken);
     }
 }

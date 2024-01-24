@@ -3,14 +3,12 @@ package socketTest.socketTestspring.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.micrometer.common.lang.NonNullApi;
-import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,9 +30,10 @@ import static socketTest.socketTestspring.exception.myExceptions.JwtErrorCode.*;
 @Component
 @NonNullApi
 @AllArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtMemberDetailsService jwtMemberDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -43,39 +42,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        String token = extractJwtFromRequest(request);
-        if (token == null) {
+
+        String accessToken = jwtTokenUtil.getHeaderToken(request, "Access");
+        String refreshToken = jwtTokenUtil.getHeaderToken(request, "Refresh");
+        if (accessToken== null || refreshToken == null) {
             filterExceptionHandler(response, TOKEN_NOT_EXIST);
             return;
         }
         try {
-            String memberId = jwtTokenUtil.getMemberId(token); // Possible exception: ExpiredJwtException may occur.
-            log.info("get memberId : {}", memberId); // memberId can be null
-
+            String memberId = jwtTokenUtil.getMemberId(accessToken, "Access"); // Possible exception: ExpiredJwtException may occur.
             UserDetails memberDetails = jwtMemberDetailsService.loadUserByUsername(memberId); // Possible exception: UsernameNotFoundException may occur.
-            log.info("created UserDetails : {}", memberDetails); // memberDetails must not be null
-
-            if (!jwtTokenUtil.validateToken(token, memberDetails)) {
-                filterExceptionHandler(response, BAD_TOKEN);
-                return;
-            }
-
-            log.info("Stored at Security Context, role : {}", memberDetails.getAuthorities());
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
-                    = new UsernamePasswordAuthenticationToken(memberDetails, null, memberDetails.getAuthorities());
-            usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
+            setAuthentication(memberDetails,request);
             filterChain.doFilter(request, response);
-        }
-        catch(ExpiredJwtException e) {
-            filterExceptionHandler(response, TOKEN_EXPIRED);
         }
         catch(UsernameNotFoundException e) {
             filterExceptionHandler(response, BAD_TOKEN);
         }
+        catch(ExpiredJwtException e) {
+            if(jwtTokenUtil.refreshTokenValidation(refreshToken)){
+                String memberId = jwtTokenUtil.getMemberId(refreshToken,"Refresh");
+                UserDetails memberDetails = jwtMemberDetailsService.loadUserByUsername(memberId); // Possible exception: UsernameNotFoundException may occur.
+                String newAccessToken = jwtTokenUtil.createAccessToken(memberId);
+                jwtTokenUtil.setHeaderAccessToken(response,newAccessToken);
+                setAuthentication( memberDetails, request);
+                return;
+            }
+            filterExceptionHandler(response, BAD_TOKEN);
+        }
     }
-
+    public void setAuthentication( UserDetails memberDetails, HttpServletRequest request) {
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
+                = new UsernamePasswordAuthenticationToken(memberDetails, null, memberDetails.getAuthorities());
+        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+    }
     public void filterExceptionHandler(HttpServletResponse response, ErrorCode error) {
         log.error("{} : {}", error.getHttpStatus(), error.getMessage());
         response.setStatus(error.getHttpStatus().value());
@@ -87,13 +87,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-    }
-    @Nullable
-    private String extractJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION); //"Authorization"
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
     }
 }

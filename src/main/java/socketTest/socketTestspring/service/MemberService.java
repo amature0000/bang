@@ -5,10 +5,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import socketTest.socketTestspring.domain.Member;
+import socketTest.socketTestspring.domain.RefreshToken;
+import socketTest.socketTestspring.dto.TokenDto;
 import socketTest.socketTestspring.dto.member.join.MemberJoinRequest;
 import socketTest.socketTestspring.exception.MyException;
 import socketTest.socketTestspring.repository.MemberRepository;
+import socketTest.socketTestspring.repository.RefreshTokenRepository;
 import socketTest.socketTestspring.tools.JwtTokenUtil;
+
+import java.util.Optional;
 
 import static socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode.BAD_USER_ACCESS;
 
@@ -20,6 +25,9 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder encoder;
     private final JwtTokenUtil jwtTokenUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+
 
     @Transactional
     public Member join(MemberJoinRequest memberJoinRequest){
@@ -34,15 +42,25 @@ public class MemberService {
         return member;
     }
 
-    public String login(String memberId, String memberPassword){
+    public TokenDto login(String memberId, String memberPassword){
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() ->  new MyException(BAD_USER_ACCESS, "wrong user Id or Password"));
         if(!encoder.matches(memberPassword, member.getMemberPassword())){
             throw new MyException(BAD_USER_ACCESS, "wrong user Id or Password");
         }
 
-        return jwtTokenUtil.createToken(memberId);
+        TokenDto tokenDto = jwtTokenUtil.createAllToken(memberId);
+        //refreshToken 있는지 확인
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByMemberId(memberId);
+        if(refreshToken.isPresent()){
+            refreshTokenRepository.save(refreshToken.get().updateToken(tokenDto.refreshToken()));
+        } else{
+            RefreshToken newToken = new RefreshToken(tokenDto.refreshToken(), memberId);
+            refreshTokenRepository.save(newToken);
+        }
+        return tokenDto;
     }
+
 
     //TODO : 방 입장, 퇴장 관련 로직 구현
 }
