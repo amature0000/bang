@@ -66,7 +66,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     filterExceptionHandler(response, BAD_TOKEN);
                     return;
                 }
-                // TODO : Refresh token and access token must have the same id
+
                 String newAccessToken = jwtTokenUtil.createToken(refreshTokenMemberId, TokenType.ACCESS);
                 setHeader(response,newAccessToken, TokenType.ACCESS);
 
