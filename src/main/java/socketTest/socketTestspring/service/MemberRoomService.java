@@ -14,10 +14,10 @@ import static socketTest.socketTestspring.exception.myExceptions.ServerConnectio
 
 @Service
 @RequiredArgsConstructor
-public class MessageService {
+public class MemberRoomService {
     private final MemoryRoomRepository roomRepository;
 
-    public Room findOne(String roomId) {
+    private Room findOne(String roomId) throws MyException {
         return roomRepository.findByRoomId(roomId).orElseThrow(() ->
                 new MyException(BAD_ROOM_ACCESS, "No rooms found")
         );

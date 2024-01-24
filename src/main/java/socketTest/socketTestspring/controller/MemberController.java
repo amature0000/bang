@@ -15,6 +15,7 @@ import socketTest.socketTestspring.dto.member.login.MemberLoginRequest;
 import socketTest.socketTestspring.dto.member.login.MemberLoginResponse;
 import socketTest.socketTestspring.exception.MyResponse;
 import socketTest.socketTestspring.service.MemberService;
+import socketTest.socketTestspring.tools.TokenType;
 
 @RestController
 @RequestMapping("api/users")
@@ -33,8 +34,8 @@ public class MemberController {
     @PostMapping("/login")
     public MyResponse<MemberLoginResponse> login(@RequestBody MemberLoginRequest memberLoginRequest, HttpServletResponse response){
         TokenDto token = memberService.login(memberLoginRequest.memberId(), memberLoginRequest.memberPassword());
-        response.addHeader("Access_Token", token.accessToken());
-        response.addHeader("Refresh_Token", token.refreshToken());
+        response.addHeader(TokenType.ACCESS.getHeader(), token.accessToken());
+        response.addHeader(TokenType.REFRESH.getHeader(), token.refreshToken());
         return MyResponse.success(new MemberLoginResponse(token));
     }
 

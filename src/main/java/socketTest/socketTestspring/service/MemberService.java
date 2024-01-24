@@ -27,10 +27,8 @@ public class MemberService {
     private final JwtTokenUtil jwtTokenUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
-
-
     @Transactional
-    public Member join(MemberJoinRequest memberJoinRequest){
+    public Member join(MemberJoinRequest memberJoinRequest) {
         memberRepository.findByMemberId(memberJoinRequest.memberId())
                 .ifPresent(member1 -> {
                     throw new MyException(BAD_USER_ACCESS, "user Id is duplicated");
@@ -42,15 +40,16 @@ public class MemberService {
         return member;
     }
 
-    public TokenDto login(String memberId, String memberPassword){
+    public TokenDto login(String memberId, String memberPassword) {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() ->  new MyException(BAD_USER_ACCESS, "wrong user Id or Password"));
         if(!encoder.matches(memberPassword, member.getMemberPassword())){
             throw new MyException(BAD_USER_ACCESS, "wrong user Id or Password");
         }
 
-        TokenDto tokenDto = jwtTokenUtil.createAllToken(memberId);
+        TokenDto tokenDto = jwtTokenUtil.createTokens(memberId);
         //refreshToken 있는지 확인
+        // TODO : Refresh Token 을 재할당 하는 로직은 MemberService 의 login 메소드가 아닌 다른 곳에서 구현해야 적절함. 유저 정보 관리 Service 에 구현해야 하는 내용이 아님.
         Optional<RefreshToken> refreshToken = refreshTokenRepository.findByMemberId(memberId);
         if(refreshToken.isPresent()){
             refreshTokenRepository.save(refreshToken.get().updateToken(tokenDto.refreshToken()));
@@ -60,7 +59,4 @@ public class MemberService {
         }
         return tokenDto;
     }
-
-
-    //TODO : 방 입장, 퇴장 관련 로직 구현
 }
