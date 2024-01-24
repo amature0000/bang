@@ -89,8 +89,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return request.getHeader(type.getHeader());
     }
 
-    private void setHeader(HttpServletResponse response, String accessToken, TokenType type) {
-        response.setHeader(type.getHeader(), accessToken);
+    private void setHeader(HttpServletResponse response, String token, TokenType type) {
+        response.setHeader(type.getHeader(), token);
     }
 
     private void setAuthentication(UserDetails memberDetails, HttpServletRequest request) {
