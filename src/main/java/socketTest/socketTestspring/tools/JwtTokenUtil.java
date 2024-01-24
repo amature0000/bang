@@ -83,6 +83,6 @@ public class JwtTokenUtil {
         }
     }
     public Boolean refreshTokenValidation(String memberId, String token) throws UsernameNotFoundException {
-        return token.equals(refreshTokenService.getRefreshToken(memberId).getRefreshToken());
+        return token.equals(refreshTokenService.findOne(memberId).getRefreshToken());
     }
 }

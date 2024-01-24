@@ -11,7 +11,7 @@ import socketTest.socketTestspring.repository.RefreshTokenRepository;
 public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public RefreshToken getRefreshToken(String memberId) throws UsernameNotFoundException {
+    public RefreshToken findOne(String memberId) throws UsernameNotFoundException {
         return refreshTokenRepository.findByMemberId(memberId).orElseThrow(() ->
                 new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
