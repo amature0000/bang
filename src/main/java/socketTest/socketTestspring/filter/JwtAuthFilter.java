@@ -3,6 +3,7 @@ package socketTest.socketTestspring.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.micrometer.common.lang.NonNullApi;
+import io.micrometer.common.lang.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import socketTest.socketTestspring.exception.MyResponse;
 import socketTest.socketTestspring.exception.myExceptions.ErrorCode;
 import socketTest.socketTestspring.service.JwtMemberDetailsService;
 import socketTest.socketTestspring.tools.JwtTokenUtil;
+import socketTest.socketTestspring.tools.TokenType;
 
 import java.io.IOException;
 
@@ -34,7 +36,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtMemberDetailsService jwtMemberDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String servletPath = request.getServletPath();
@@ -42,16 +43,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
-        String accessToken = jwtTokenUtil.getHeaderToken(request, "Access");
-        String refreshToken = jwtTokenUtil.getHeaderToken(request, "Refresh");
+        String accessToken = getTokenFromHeader(request, TokenType.ACCESS);
+        String refreshToken = getTokenFromHeader(request, TokenType.REFRESH);
         if (accessToken== null || refreshToken == null) {
             filterExceptionHandler(response, TOKEN_NOT_EXIST);
             return;
         }
         try {
-            String memberId = jwtTokenUtil.getMemberId(accessToken, "Access"); // Possible exception: ExpiredJwtException may occur.
-            UserDetails memberDetails = jwtMemberDetailsService.loadUserByUsername(memberId); // Possible exception: UsernameNotFoundException may occur.
+            String accessTokenMemberId = jwtTokenUtil.getMemberId(accessToken, TokenType.ACCESS); // Possible exception: ExpiredJwtException may occur.
+            UserDetails memberDetails = jwtMemberDetailsService.loadUserByUsername(accessTokenMemberId); // Possible exception: UsernameNotFoundException may occur.
             setAuthentication(memberDetails,request);
             filterChain.doFilter(request, response);
         }
@@ -59,24 +59,47 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterExceptionHandler(response, BAD_TOKEN);
         }
         catch(ExpiredJwtException e) {
-            if(jwtTokenUtil.refreshTokenValidation(refreshToken)){
-                String memberId = jwtTokenUtil.getMemberId(refreshToken,"Refresh");
-                UserDetails memberDetails = jwtMemberDetailsService.loadUserByUsername(memberId); // Possible exception: UsernameNotFoundException may occur.
-                String newAccessToken = jwtTokenUtil.createAccessToken(memberId);
-                jwtTokenUtil.setHeaderAccessToken(response,newAccessToken);
-                setAuthentication( memberDetails, request);
-                return;
+            // Refresh Token을 검증하고, 새 Access Token을 발급한다.
+            try{
+                String refreshTokenMemberId = jwtTokenUtil.getMemberId(refreshToken, TokenType.REFRESH); // Possible exception: ExpiredJwtException may occur.
+                if(!jwtTokenUtil.refreshTokenValidation(refreshTokenMemberId, refreshToken)) { // UsernameNotFoundException may occur.
+                    filterExceptionHandler(response, BAD_TOKEN);
+                    return;
+                }
+                // TODO : Refresh token and access token must have the same id
+                String newAccessToken = jwtTokenUtil.createToken(refreshTokenMemberId, TokenType.ACCESS);
+                setHeader(response,newAccessToken, TokenType.ACCESS);
+
+                // refresh token 으로 사용자 인가를 내주고 있었다. new access token 을 사용하는 것과 논리적인 차이는 없지만 일관성을 위해 수정하였음.
+                String newAccessTokenMemberId = jwtTokenUtil.getMemberId(newAccessToken, TokenType.ACCESS);
+                UserDetails memberDetails = jwtMemberDetailsService.loadUserByUsername(newAccessTokenMemberId); // Possible exception: UsernameNotFoundException may occur.
+                setAuthentication(memberDetails, request);
+                filterChain.doFilter(request, response);
             }
-            filterExceptionHandler(response, BAD_TOKEN);
+            catch (UsernameNotFoundException ex) {
+                filterExceptionHandler(response, BAD_TOKEN);
+            }
+            catch (ExpiredJwtException ex) {
+                filterExceptionHandler(response, REFRESH_TOKEN_EXPIRED);
+            }
         }
     }
-    public void setAuthentication( UserDetails memberDetails, HttpServletRequest request) {
+    @Nullable
+    private String getTokenFromHeader(HttpServletRequest request, TokenType type){
+        return request.getHeader(type.getHeader());
+    }
+
+    private void setHeader(HttpServletResponse response, String accessToken, TokenType type) {
+        response.setHeader(type.getHeader(), accessToken);
+    }
+
+    private void setAuthentication(UserDetails memberDetails, HttpServletRequest request) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
                 = new UsernamePasswordAuthenticationToken(memberDetails, null, memberDetails.getAuthorities());
         usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
     }
-    public void filterExceptionHandler(HttpServletResponse response, ErrorCode error) {
+    private void filterExceptionHandler(HttpServletResponse response, ErrorCode error) {
         log.error("{} : {}", error.getHttpStatus(), error.getMessage());
         response.setStatus(error.getHttpStatus().value());
         response.setContentType("application/json");
