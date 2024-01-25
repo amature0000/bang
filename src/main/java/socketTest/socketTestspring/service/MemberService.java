@@ -9,7 +9,6 @@ import socketTest.socketTestspring.dto.TokenDto;
 import socketTest.socketTestspring.dto.member.join.MemberJoinRequest;
 import socketTest.socketTestspring.exception.MyException;
 import socketTest.socketTestspring.repository.MemberRepository;
-import socketTest.socketTestspring.repository.RefreshTokenRepository;
 import socketTest.socketTestspring.tools.JwtTokenUtil;
 
 import static socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode.BAD_USER_ACCESS;
