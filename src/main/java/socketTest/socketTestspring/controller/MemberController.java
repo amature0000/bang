@@ -15,6 +15,7 @@ import socketTest.socketTestspring.dto.member.login.MemberLoginRequest;
 import socketTest.socketTestspring.dto.member.login.MemberLoginResponse;
 import socketTest.socketTestspring.exception.MyResponse;
 import socketTest.socketTestspring.service.MemberService;
+import socketTest.socketTestspring.service.RefreshTokenService;
 import socketTest.socketTestspring.tools.TokenType;
 
 @RestController
@@ -23,7 +24,7 @@ import socketTest.socketTestspring.tools.TokenType;
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
-
+    private final RefreshTokenService refreshTokenService;
     @PostMapping("/join")
     public MyResponse<MemberJoinResponse> join(@RequestBody MemberJoinRequest memberJoinRequest){
         Member newMember = memberService.join(memberJoinRequest);
@@ -33,10 +34,11 @@ public class MemberController {
 
     @PostMapping("/login")
     public MyResponse<MemberLoginResponse> login(@RequestBody MemberLoginRequest memberLoginRequest, HttpServletResponse response){
-        TokenDto token = memberService.login(memberLoginRequest.memberId(), memberLoginRequest.memberPassword());
-        response.addHeader(TokenType.ACCESS.getHeader(), token.accessToken());
-        response.addHeader(TokenType.REFRESH.getHeader(), token.refreshToken());
-        return MyResponse.success(new MemberLoginResponse(token));
+        TokenDto tokenDto = memberService.login(memberLoginRequest.memberId(), memberLoginRequest.memberPassword());
+        refreshTokenService.updateRefreshToken(memberLoginRequest.memberId(), tokenDto);
+        response.addHeader(TokenType.ACCESS.getHeader(), tokenDto.accessToken());
+        response.addHeader(TokenType.REFRESH.getHeader(), tokenDto.refreshToken());
+        return MyResponse.success(new MemberLoginResponse(tokenDto));
     }
 
 
