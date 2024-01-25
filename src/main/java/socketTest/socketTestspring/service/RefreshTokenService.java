@@ -22,9 +22,7 @@ public class RefreshTokenService {
     public void updateRefreshToken(String memberId, TokenDto tokenDto){
         Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findByMemberId(memberId);
 
-        refreshTokenOptional.ifPresent(existingToken -> {
-            refreshTokenRepository.save(existingToken.updateToken(tokenDto.refreshToken()));
-        });
+        refreshTokenOptional.ifPresent(existingToken -> refreshTokenRepository.save(existingToken.updateToken(tokenDto.refreshToken())));
 
         refreshTokenOptional.orElseGet(() -> {
             RefreshToken newToken = new RefreshToken(tokenDto.refreshToken(), memberId);
