@@ -37,8 +37,8 @@ public class SecurityConfig {
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
                         .requestMatchers("api/users/login","api/users/join").permitAll()
                         .requestMatchers(HttpMethod.POST,"api/**").authenticated() //api 경로의 post 방식은 인가 필요
-                        .requestMatchers("ws/**").permitAll() //stomp handshake
-                        .anyRequest().permitAll() // TODO : 보안 기능 해제됨
+                        .requestMatchers("ws/**").permitAll() //stomp handshake // TODO : 보안 기능 해제됨
+                        .requestMatchers("test/**").permitAll() // TODO : 보안 기능 해제됨
                 )
 
                 .sessionManagement(sessionManagement -> sessionManagement
