@@ -6,7 +6,6 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-//TODO : memory domain 으로 변경 후 Map 추가. connected member 관리
 
 @Getter
 @Setter
