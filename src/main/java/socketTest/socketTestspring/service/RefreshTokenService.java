@@ -3,33 +3,32 @@ package socketTest.socketTestspring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import socketTest.socketTestspring.domain.RefreshToken;
 import socketTest.socketTestspring.dto.TokenDto;
 import socketTest.socketTestspring.repository.RefreshTokenRepository;
 
-import java.util.Optional;
-
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
-
 
     public RefreshToken findOne(String memberId) throws UsernameNotFoundException {
         return refreshTokenRepository.findByMemberId(memberId).orElseThrow(() ->
                 new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
+
     public void updateRefreshToken(String memberId, TokenDto tokenDto){
-        Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findByMemberId(memberId);
+        RefreshToken refreshToken = refreshTokenRepository.findByMemberId(memberId).orElse(null);
 
-        refreshTokenOptional.ifPresent(existingToken -> refreshTokenRepository.save(existingToken.updateToken(tokenDto.refreshToken())));
-
-        refreshTokenOptional.orElseGet(() -> {
+        if(refreshToken != null) {
+            refreshTokenRepository.save(refreshToken.updateToken(tokenDto.refreshToken()));
+        }
+        else {
             RefreshToken newToken = new RefreshToken(tokenDto.refreshToken(), memberId);
             refreshTokenRepository.save(newToken);
-            return newToken;
-        });
-
+        }
     }
 
 }

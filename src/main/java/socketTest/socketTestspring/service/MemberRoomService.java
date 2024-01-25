@@ -3,6 +3,7 @@ package socketTest.socketTestspring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import socketTest.socketTestspring.domain.MemberInfo;
 import socketTest.socketTestspring.domain.Room;
 import socketTest.socketTestspring.dto.room.join.RoomJoinRequest;
@@ -13,6 +14,7 @@ import socketTest.socketTestspring.repository.MemoryRoomRepository;
 import static socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode.BAD_ROOM_ACCESS;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class MemberRoomService {
     private final MemoryRoomRepository roomRepository;
@@ -29,6 +31,6 @@ public class MemberRoomService {
 
         boolean result = roomRepository.joinRoom(joinRoom, memberInfo);
         if (!result) throw new MyException(BAD_ROOM_ACCESS, "Cannot join the room");
-        return new RoomJoinResponse("joined"); // TODO : response 문에 추가할 만한 데이터가 있으면 추가하기.
+        return new RoomJoinResponse("joined");
     }
 }

@@ -34,8 +34,8 @@ public class MemberController {
 
     @PostMapping("/login")
     public MyResponse<MemberLoginResponse> login(@RequestBody MemberLoginRequest memberLoginRequest, HttpServletResponse response){
-        TokenDto tokenDto = memberService.login(memberLoginRequest.memberId(), memberLoginRequest.memberPassword());
-        refreshTokenService.updateRefreshToken(memberLoginRequest.memberId(), tokenDto);
+        TokenDto tokenDto = memberService.login(memberLoginRequest);
+        refreshTokenService.updateRefreshToken(memberLoginRequest.memberId(), tokenDto); // must not throw any exceptions.
         response.addHeader(TokenType.ACCESS.getHeader(), tokenDto.accessToken());
         response.addHeader(TokenType.REFRESH.getHeader(), tokenDto.refreshToken());
         return MyResponse.success(new MemberLoginResponse(tokenDto));

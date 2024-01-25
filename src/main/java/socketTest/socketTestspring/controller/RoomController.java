@@ -16,8 +16,6 @@ import socketTest.socketTestspring.service.RoomService;
 
 import java.util.List;
 
-//방 생성 및 조회 관련 API 통신
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
