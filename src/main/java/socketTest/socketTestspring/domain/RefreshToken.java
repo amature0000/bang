@@ -1,16 +1,14 @@
 package socketTest.socketTestspring.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {
 
     @Id
@@ -18,15 +16,18 @@ public class RefreshToken {
     private Long id;
 
     @NotBlank
-    private String refreshToken;
-    @NotBlank
+    @Column(unique = true)
     private String memberId;
+
+    @NotBlank
+    private String refreshToken;
 
     public RefreshToken(String token, String id){
         this.refreshToken = token;
         this.memberId = id;
     }
-    public RefreshToken updateToken(String token){
+
+    public RefreshToken updateToken(String token) {
         this.refreshToken = token;
         return this;
     }
