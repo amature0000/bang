@@ -3,11 +3,13 @@ package socketTest.socketTestspring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import socketTest.socketTestspring.domain.RefreshToken;
 import socketTest.socketTestspring.dto.TokenDto;
 import socketTest.socketTestspring.repository.RefreshTokenRepository;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
