@@ -39,7 +39,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String servletPath = request.getServletPath();
-        if (servletPath.equals("/api/users/login") || servletPath.equals("/api/users/join")|| servletPath.equals("/ws")) { //early return logic
+        if(servletPath.startsWith("/ws") || servletPath.startsWith("/test")) { // TODO : Stomp 테스트를 위한 보안 기능 해제
+            filterChain.doFilter(request, response);
+            return;
+        }
+        if (servletPath.equals("/api/users/login") || servletPath.equals("/api/users/join")) { //early return logic
             filterChain.doFilter(request, response);
             return;
         }

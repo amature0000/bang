@@ -13,10 +13,9 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     @Override
     protected void configureInbound(MessageSecurityMetadataSourceRegistry message) {
         message
-                .nullDestMatcher().permitAll() //Jwt validation at WebSocketInterceptor
+                .nullDestMatcher().permitAll() // TODO : 연결 시 보안 인증을 어떻게 할 것인가?
                 .simpSubscribeDestMatchers("/sub/**").permitAll()
-                .simpDestMatchers("/pub/**").permitAll()
-                .anyMessage().denyAll();
+                .simpDestMatchers("/pub/**").permitAll();
     }
 
     @Override

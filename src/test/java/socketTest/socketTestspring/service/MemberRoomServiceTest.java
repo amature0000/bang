@@ -30,8 +30,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MemberRoomServiceTest {
     @Autowired
     RoomService roomService;
-    @Autowired
-    MemberRoomService memberRoomService;
 
     @BeforeEach
     void setUp() {
@@ -76,7 +74,7 @@ class MemberRoomServiceTest {
         // given
         RoomJoinRequest roomJoinRequest = new RoomJoinRequest(roomId);
         // when
-        RoomJoinResponse roomJoinResponse = memberRoomService.joinRoom(roomJoinRequest);
+        RoomJoinResponse roomJoinResponse = roomService.joinRoom(roomJoinRequest);
         // then
         assertThat(roomJoinResponse.response()).isEqualTo("joined");
     }

@@ -34,4 +34,8 @@ public class MemoryRoomRepository {
         if(joinedMembers.size() >= Room.MAX_JOINED) return false;
         return joinedMembers.add(memberInfo);
     }
+
+    public boolean quitRoom(Room room, MemberInfo memberInfo) {
+        return room.getJoinedMembers().remove(memberInfo);
+    }
 }

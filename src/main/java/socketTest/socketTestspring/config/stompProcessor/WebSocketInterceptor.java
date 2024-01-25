@@ -11,7 +11,8 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
-import socketTest.socketTestspring.service.MemberRoomService;
+import socketTest.socketTestspring.dto.room.join.RoomJoinRequest;
+import socketTest.socketTestspring.service.RoomService;
 
 import java.util.Objects;
 
@@ -21,47 +22,53 @@ import java.util.Objects;
 @NonNullApi
 @AllArgsConstructor
 public class WebSocketInterceptor implements ChannelInterceptor {
-    final private MemberRoomService messageService;
+    final private RoomService roomService;
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if (accessor == null) throw new IllegalStateException("No message found.");
-        log.info("accessor :\n{}", accessor);
+        log.info("{}", message);
 
         StompCommand command = accessor.getCommand();
         /*
-        if (Objects.equals(command, StompCommand.CONNECT)) {
-            handleConnect(accessor);
-        }
+        if (Objects.equals(command, StompCommand.CONNECT)) handleConnect(accessor);
         */
+        if (Objects.equals(command, StompCommand.DISCONNECT)) handleDisconnect(accessor);
 
-        if (Objects.equals(command, StompCommand.DISCONNECT)) {
-            handleDisconnect(accessor);
-        }
-        if (Objects.equals(command, StompCommand.SUBSCRIBE)) {
-            handleSubscribe(accessor);
-        }
+        if (Objects.equals(command, StompCommand.SUBSCRIBE)) handleSubscribe(accessor);
 
-        if (Objects.equals(command, StompCommand.SEND)) {
-            handleSend(accessor);
-        }
+        if (Objects.equals(command, StompCommand.SEND)) handleSend(accessor);
+
         return message;
     }
 
     // MessageDeliveryException 만을 발생시켜야 하며, 구분은 안의 String 으로 한다.
-    /*
+
     private void handleConnect(StompHeaderAccessor accessor) throws MessageDeliveryException {
         // CONNECT 요청 처리 로직
     }
-    */
+
     private void handleDisconnect(StompHeaderAccessor accessor) throws MessageDeliveryException {
         // DISCONNECT 요청 처리 로직
         // TODO : 접속중인 방들로부터 탈퇴 처리를 해야 할까?
     }
 
     private void handleSubscribe(StompHeaderAccessor accessor) throws MessageDeliveryException {
-        // SUBSCRIBE 요청 처리 로직
-        // TODO : 해당 방에 입장 가능한 상황인지 검사
+        String destination = accessor.getDestination();
+        if(destination == null) throw new MessageDeliveryException("Null");
+        if(destination.equals("/sub/channel/A")) return; // TODO : Stomp 테스트를 위한 보안 기능 해제
+        if(!destination.startsWith("/sub/channel/")) throw new MessageDeliveryException("Illegal path");
+
+        String realDestination = destination.substring(13);
+        log.info("Joining... room id : {}",realDestination);
+        try {
+            roomService.joinRoom(new RoomJoinRequest(realDestination));
+        }
+        catch (Exception e) {
+            log.error(e.getMessage());
+            throw new MessageDeliveryException("Join failed");
+        }
+
     }
 
     private void handleSend(StompHeaderAccessor accessor) throws MessageDeliveryException {

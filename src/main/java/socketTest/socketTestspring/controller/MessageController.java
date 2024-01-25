@@ -21,4 +21,8 @@ public class MessageController {
     public void sendMessage(Message message) {
         simpMessageSendingOperations.convertAndSend("/sub/channel/" + message.getChannelId(), message);
     }
+    @MessageMapping("test")
+    public void sendMessageTest(String message) {
+        simpMessageSendingOperations.convertAndSend("/sub/channel/A", message);
+    }
 }
