@@ -12,8 +12,7 @@ import socketTest.socketTestspring.exception.MyException;
 import socketTest.socketTestspring.repository.MemberRepository;
 import socketTest.socketTestspring.tools.JwtTokenUtil;
 
-import java.util.Optional;
-
+import static socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode.BAD_ROOM_ACCESS;
 import static socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode.BAD_USER_ACCESS;
 
 
@@ -25,8 +24,10 @@ public class MemberService {
     private final BCryptPasswordEncoder encoder;
     private final JwtTokenUtil jwtTokenUtil;
 
-    public Optional<Member> findById(String memberId) {
-        return memberRepository.findByMemberId(memberId);
+    public Member findById(String memberId) {
+        return memberRepository.findByMemberId(memberId).orElseThrow(() ->
+                new MyException(BAD_ROOM_ACCESS, "Cannot find any member")
+        );
     }
 
     @Transactional

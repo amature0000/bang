@@ -27,7 +27,7 @@ public class MemberServiceTest {
         //when
         Member joinedMember = memberService.join(memberJoinRequest);
         //then
-        Member findMember = memberService.findById(joinedMember.getMemberId()).get();
+        Member findMember = memberService.findById(joinedMember.getMemberId());
         assertThat(memberJoinRequest.memberId()).isEqualTo(findMember.getMemberId());
     }
 
