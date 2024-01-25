@@ -3,6 +3,7 @@ package socketTest.socketTestspring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import socketTest.socketTestspring.domain.Room;
 import socketTest.socketTestspring.dto.room.RoomDto;
 import socketTest.socketTestspring.dto.room.create.RoomCreateRequest;
@@ -20,6 +21,7 @@ import static socketTest.socketTestspring.exception.myExceptions.ServerConnectio
 
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RoomService {
     private final MemoryRoomRepository roomRepository;
