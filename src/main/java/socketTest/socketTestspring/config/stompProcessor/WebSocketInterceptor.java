@@ -11,9 +11,11 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
+import socketTest.socketTestspring.dto.MyMessage;
 import socketTest.socketTestspring.dto.room.join.RoomJoinRequest;
 import socketTest.socketTestspring.service.RoomService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 // 참고 : https://velog.io/@jkijki12/%EC%B1%84%ED%8C%85-STOMP-JWT
@@ -23,11 +25,12 @@ import java.util.Objects;
 @AllArgsConstructor
 public class WebSocketInterceptor implements ChannelInterceptor {
     final private RoomService roomService;
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if (accessor == null) throw new IllegalStateException("No message found.");
-        log.info("{}", message);
+        log.info("{}", accessor);
 
         StompCommand command = accessor.getCommand();
         /*
@@ -37,7 +40,7 @@ public class WebSocketInterceptor implements ChannelInterceptor {
 
         if (Objects.equals(command, StompCommand.SUBSCRIBE)) handleSubscribe(accessor);
 
-        if (Objects.equals(command, StompCommand.SEND)) handleSend(accessor);
+        if (Objects.equals(command, StompCommand.SEND)) handleSend(message);
 
         return message;
     }
@@ -55,24 +58,32 @@ public class WebSocketInterceptor implements ChannelInterceptor {
 
     private void handleSubscribe(StompHeaderAccessor accessor) throws MessageDeliveryException {
         String destination = accessor.getDestination();
-        if(destination == null) throw new MessageDeliveryException("Null");
-        if(destination.equals("/sub/channel/A")) return; // TODO : Stomp 테스트를 위한 보안 기능 해제
-        if(!destination.startsWith("/sub/channel/")) throw new MessageDeliveryException("Illegal path");
+        if (destination == null) throw new MessageDeliveryException("Null");
+        if (destination.equals("/sub/channel/A")) return; // TODO : Stomp 테스트를 위한 보안 기능 해제
+        if (!destination.startsWith("/sub/channel/")) throw new MessageDeliveryException("Illegal path");
 
         String realDestination = destination.substring(13);
-        log.info("Joining... room id : {}",realDestination);
+        log.info("Joining... room id : {}", realDestination);
         try {
             roomService.joinRoom(new RoomJoinRequest(realDestination));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
             throw new MessageDeliveryException("Join failed");
         }
 
     }
 
-    private void handleSend(StompHeaderAccessor accessor) throws MessageDeliveryException {
-        // SEND 요청 처리 로직
+    private void handleSend(Message<?> message) throws MessageDeliveryException {
+        Object payload = message.getPayload();
+        if (!(payload instanceof byte[])) throw new MessageDeliveryException("Null");
+
+        String jsonPayload = new String((byte[]) payload, StandardCharsets.UTF_8);
+        String channelId;
+        try {channelId = MyMessage.fromJson(jsonPayload).channelId();}
+        catch (Exception e) {
+            throw new MessageDeliveryException("Null");
+        }
         // TODO : send 요청에 대한 유효성 검사
+        log.info("extracted channelId : {}", channelId);
     }
 }

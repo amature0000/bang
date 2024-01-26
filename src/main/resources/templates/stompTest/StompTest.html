@@ -10,7 +10,17 @@
 <h1>WebSocket Chat</h1>
 
     <label for="message-input">Message:</label>
+    <br>
+    <input type="radio" name="messageType" value="ENTER" checked>ENTER
+    <input type="radio" name="messageType" value="TALK"> TALK
+    <input type="radio" name="messageType" value="QUIT"> QUIT
+    <br>
+    <input type="text" id="sender-input" placeholder="Enter a sender">
+    <br>
+    <input type="text" id="channel-input" placeholder="Enter a channelId">
+    <br>
     <input type="text" id="message-input" placeholder="Enter a message">
+    <br>
     <button onclick="sendMessage()">Send</button>
 
 <ul id="messages">
@@ -40,8 +50,18 @@
     }
 
     function sendMessage() {
+        var messageType = document.querySelector('input[name="messageType"]:checked').value;
+        var sender = document.getElementById('sender-input').value;
+        var channel = document.getElementById('channel-input').value;
         var message = document.getElementById('message-input').value;
-        stompClient.send("/pub/test", {}, JSON.stringify({'message': message}));
+
+        var jsonMessage = {
+            "type" : messageType,
+            "sender" : sender,
+            "channelId" : channel,
+            "data" : message
+        };
+        stompClient.send("/pub/test", {}, JSON.stringify(jsonMessage));
     }
 
     function showMessage(message) {
