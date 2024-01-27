@@ -11,8 +11,6 @@ import socketTest.socketTestspring.dto.room.create.RoomCreateRequest;
 import socketTest.socketTestspring.dto.room.create.RoomCreateResponse;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteRequest;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteResponse;
-import socketTest.socketTestspring.dto.room.join.RoomJoinRequest;
-import socketTest.socketTestspring.dto.room.join.RoomJoinResponse;
 import socketTest.socketTestspring.exception.MyException;
 import socketTest.socketTestspring.repository.MemoryRoomRepository;
 
@@ -62,14 +60,18 @@ public class RoomService {
         return new RoomDeleteResponse("room deleted");
     }
     //==== 방 입장, 퇴장 등
-    public RoomJoinResponse joinRoom(RoomJoinRequest roomJoinRequest) {
+    public boolean joinRoom(String roomId) {
         String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        Room joinRoom = findOne(roomJoinRequest.roomId()); // Possible exception: MyException may be thrown.
-        MemberInfo memberInfo = new MemberInfo(memberId);
+        Room joinRoom = roomRepository.findByRoomId(roomId).orElse(null);
+        if(joinRoom == null) return false;
+        return roomRepository.joinRoom(joinRoom, new MemberInfo(memberId));
+    }
 
-        boolean result = roomRepository.joinRoom(joinRoom, memberInfo);
-        if (!result) throw new MyException(BAD_ROOM_ACCESS, "Cannot join the room");
-        return new RoomJoinResponse("joined");
+    public boolean exitRoom(String roomId) {
+        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Room exitRoom = roomRepository.findByRoomId(roomId).orElse(null);
+        if(exitRoom == null) return false;
+        return roomRepository.quitRoom(exitRoom, new MemberInfo(memberId));
     }
 
     public boolean isJoined(String roomId) { // Must not throw any exceptions

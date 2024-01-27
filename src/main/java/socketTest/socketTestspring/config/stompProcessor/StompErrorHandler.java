@@ -18,20 +18,22 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
     @Override
     public Message<byte[]> handleClientMessageProcessingError(Message<byte[]>clientMessage,@NonNull Throwable ex) {
         String exceptionMessage = ex.getMessage();
-        if(exceptionMessage.equals("Null")) {
+        // error handle
+        if(exceptionMessage.equals(BAD_HEADER.toString())) {
             return errorHandleException("Cannot find headers", BAD_HEADER);
         }
-        if(exceptionMessage.equals("Illegal path")) {
-            return errorHandleException("This path is not allowed", BAD_PATH_ACCESS);
+        if(exceptionMessage.equals(ILLEGAL_PATH.toString())) {
+            return errorHandleException("This path is not allowed", ILLEGAL_PATH);
         }
-        if(exceptionMessage.equals("Join failed")) {
-            return messageHandleException("Cannot join the room", BAD_ROOM_ACCESS);
+        if(exceptionMessage.equals(NO_PERMISSION.toString())) {
+            return errorHandleException("You have no permission for this action", NO_PERMISSION);
         }
-        if(exceptionMessage.equals("Permission")) {
-            return errorHandleException("You have no permission for this action", BAD_STOMP_ACCESS);
+        // message handle
+        if(exceptionMessage.equals(ACTION_FAILED.toString())) {
+            return messageHandleException("Action failed", ACTION_FAILED);
         }
-        if(exceptionMessage.equals("Already")) {
-            return messageHandleException("This action has already been attempted", BAD_ROOM_ACCESS);
+        if(exceptionMessage.equals(DUPLICATED_ACTION.toString())) {
+            return messageHandleException("This action has already been attempted", DUPLICATED_ACTION);
         }
         return super.handleClientMessageProcessingError(clientMessage, ex);
     }
