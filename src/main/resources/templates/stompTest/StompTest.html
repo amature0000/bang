@@ -6,10 +6,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </head>
 <body>
-
+<h1>Connection</h1>
+<label>Channel:</label>
+<br>
+<input type="text" id="connection-input" placeholder="Enter a channel">
+<br>
+<button onclick="subscribe()">connect</button>
+<button onclick="unsubscribe()">connect</button>
 <h1>WebSocket Chat</h1>
 
-    <label for="message-input">Message:</label>
+    <label>Message:</label>
     <br>
     <input type="radio" name="messageType" value="ENTER" checked>ENTER
     <input type="radio" name="messageType" value="TALK"> TALK
@@ -36,12 +42,21 @@
 
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/sub/channel/A', function (response) {
-                console.log(response);
-            });
+
         });
     }
-
+    function subscribe() {
+        var channel = document.getElementById('connection-input').value;
+        stompClient.subscribe('/sub/channel/' + channel, function (response) {
+            console.log(response);
+        });
+    }
+    function unsubscribe() {
+        var channel = document.getElementById('connection-input').value;
+        stompClient.unsubscribe('/sub/channel/' + channel, function (response) {
+            console.log(response);
+        });
+    }
     function disconnect() {
         if (stompClient !== null) {
             stompClient.disconnect();

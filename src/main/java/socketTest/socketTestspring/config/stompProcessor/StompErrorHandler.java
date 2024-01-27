@@ -18,16 +18,21 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
     @Override
     public Message<byte[]> handleClientMessageProcessingError(Message<byte[]>clientMessage,@NonNull Throwable ex) {
         String exceptionMessage = ex.getMessage();
-        if(exceptionMessage.equals("Null")) { //예외 캐치 예시
+        if(exceptionMessage.equals("Null")) {
             return errorHandleException("Cannot find headers", BAD_HEADER);
         }
-        if(exceptionMessage.equals("Illegal path")) { //예외 캐치 예시
+        if(exceptionMessage.equals("Illegal path")) {
             return errorHandleException("This path is not allowed", BAD_PATH_ACCESS);
         }
-        if(exceptionMessage.equals("Join failed")) { //예외 캐치 예시
-            return errorHandleException("Cannot join the room", BAD_ROOM_ACCESS);
+        if(exceptionMessage.equals("Join failed")) {
+            return messageHandleException("Cannot join the room", BAD_ROOM_ACCESS);
         }
-
+        if(exceptionMessage.equals("Permission")) {
+            return errorHandleException("You have no permission for this action", BAD_STOMP_ACCESS);
+        }
+        if(exceptionMessage.equals("Already")) {
+            return messageHandleException("This action has already been attempted", BAD_ROOM_ACCESS);
+        }
         return super.handleClientMessageProcessingError(clientMessage, ex);
     }
 

@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-class MemberRoomServiceTest {
+class RoomServiceTest {
     @Autowired
     RoomService roomService;
 
@@ -77,5 +77,20 @@ class MemberRoomServiceTest {
         RoomJoinResponse roomJoinResponse = roomService.joinRoom(roomJoinRequest);
         // then
         assertThat(roomJoinResponse.response()).isEqualTo("joined");
+    }
+    @Test
+    void 입장체크테스트() {
+        // init
+        RoomCreateRequest roomCreateRequest = new RoomCreateRequest("room name");
+        RoomCreateResponse roomCreateResponse = roomService.createRoom(roomCreateRequest);
+        String roomId = roomCreateResponse.roomId();
+
+        //given
+        RoomJoinRequest roomJoinRequest = new RoomJoinRequest(roomId);
+        RoomJoinResponse roomJoinResponse = roomService.joinRoom(roomJoinRequest);
+        //when
+        //then
+        boolean result = roomService.isJoined(roomId);
+        assertThat(result).isEqualTo(true);
     }
 }

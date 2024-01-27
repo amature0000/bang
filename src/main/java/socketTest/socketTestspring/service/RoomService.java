@@ -71,4 +71,11 @@ public class RoomService {
         if (!result) throw new MyException(BAD_ROOM_ACCESS, "Cannot join the room");
         return new RoomJoinResponse("joined");
     }
+
+    public boolean isJoined(String roomId) { // Must not throw any exceptions
+        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Room byRoomId = roomRepository.findByRoomId(roomId).orElse(null);
+        if(byRoomId == null) return false;
+        return byRoomId.getJoinedMembers().contains(new MemberInfo(memberId));
+    }
 }

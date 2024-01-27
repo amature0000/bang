@@ -21,7 +21,7 @@ public record MyMessage(MessageType type, String sender, String channelId, Strin
 /* example
 {
     "type" : "ENTER",
-    "sender"z : "senderName",
+    "sender" : "senderName",
     "channelId" : "channelId",
     "data" : "data"
 }

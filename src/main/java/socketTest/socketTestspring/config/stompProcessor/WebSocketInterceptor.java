@@ -40,6 +40,8 @@ public class WebSocketInterceptor implements ChannelInterceptor {
 
         if (Objects.equals(command, StompCommand.SUBSCRIBE)) handleSubscribe(accessor);
 
+        if (Objects.equals(command, StompCommand.UNSUBSCRIBE)) handleUnSubscribe(accessor);
+
         if (Objects.equals(command, StompCommand.SEND)) handleSend(message);
 
         return message;
@@ -62,15 +64,29 @@ public class WebSocketInterceptor implements ChannelInterceptor {
         if (destination.equals("/sub/channel/A")) return; // TODO : Stomp 테스트를 위한 보안 기능 해제
         if (!destination.startsWith("/sub/channel/")) throw new MessageDeliveryException("Illegal path");
 
-        String realDestination = destination.substring(13);
-        log.info("Joining... room id : {}", realDestination);
+        String roomId = destination.substring(13);
+        if(roomService.isJoined(roomId)) throw new MessageDeliveryException("Already");
+
+        log.info("Joining... room id : {}", roomId);
         try {
-            roomService.joinRoom(new RoomJoinRequest(realDestination));
+            roomService.joinRoom(new RoomJoinRequest(roomId));
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new MessageDeliveryException("Join failed");
         }
+    }
 
+    private void handleUnSubscribe(StompHeaderAccessor accessor) throws MessageDeliveryException {
+        String destination = accessor.getFirstNativeHeader("id");
+        if (destination == null) throw new MessageDeliveryException("Null");
+        if (destination.equals("/sub/channel/A")) return; // TODO : Stomp 테스트를 위한 보안 기능 해제
+        if (!destination.startsWith("/sub/channel/")) throw new MessageDeliveryException("Illegal path");
+
+        String roomId = destination.substring(13);
+        if(!roomService.isJoined(roomId)) throw new MessageDeliveryException("Already");
+
+        log.info("Exiting... room id : {}", roomId);
+        // TODO : 방 탈퇴 기능 구현
     }
 
     private void handleSend(Message<?> message) throws MessageDeliveryException {
@@ -78,12 +94,13 @@ public class WebSocketInterceptor implements ChannelInterceptor {
         if (!(payload instanceof byte[])) throw new MessageDeliveryException("Null");
 
         String jsonPayload = new String((byte[]) payload, StandardCharsets.UTF_8);
-        String channelId;
-        try {channelId = MyMessage.fromJson(jsonPayload).channelId();}
+        String roomId;
+        try {roomId = MyMessage.fromJson(jsonPayload).channelId();}
         catch (Exception e) {
             throw new MessageDeliveryException("Null");
         }
-        // TODO : send 요청에 대한 유효성 검사
-        log.info("extracted channelId : {}", channelId);
+
+        log.info("extracted channelId : {}", roomId);
+        if(!roomService.isJoined(roomId)) throw new MessageDeliveryException("Permission");
     }
 }
