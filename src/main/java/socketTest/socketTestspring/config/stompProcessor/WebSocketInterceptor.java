@@ -11,8 +11,11 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
-import socketTest.socketTestspring.service.MemberRoomService;
+import socketTest.socketTestspring.dto.MyMessage;
+import socketTest.socketTestspring.dto.room.join.RoomJoinRequest;
+import socketTest.socketTestspring.service.RoomService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 // 참고 : https://velog.io/@jkijki12/%EC%B1%84%ED%8C%85-STOMP-JWT
@@ -21,51 +24,83 @@ import java.util.Objects;
 @NonNullApi
 @AllArgsConstructor
 public class WebSocketInterceptor implements ChannelInterceptor {
-    final private MemberRoomService messageService;
+    final private RoomService roomService;
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if (accessor == null) throw new IllegalStateException("No message found.");
-        log.info("accessor :\n{}", accessor);
+        log.info("{}", accessor);
 
         StompCommand command = accessor.getCommand();
         /*
-        if (Objects.equals(command, StompCommand.CONNECT)) {
-            handleConnect(accessor);
-        }
+        if (Objects.equals(command, StompCommand.CONNECT)) handleConnect(accessor);
         */
+        if (Objects.equals(command, StompCommand.DISCONNECT)) handleDisconnect(accessor);
 
-        if (Objects.equals(command, StompCommand.DISCONNECT)) {
-            handleDisconnect(accessor);
-        }
-        if (Objects.equals(command, StompCommand.SUBSCRIBE)) {
-            handleSubscribe(accessor);
-        }
+        if (Objects.equals(command, StompCommand.SUBSCRIBE)) handleSubscribe(accessor);
 
-        if (Objects.equals(command, StompCommand.SEND)) {
-            handleSend(accessor);
-        }
+        if (Objects.equals(command, StompCommand.UNSUBSCRIBE)) handleUnSubscribe(accessor);
+
+        if (Objects.equals(command, StompCommand.SEND)) handleSend(message);
+
         return message;
     }
 
     // MessageDeliveryException 만을 발생시켜야 하며, 구분은 안의 String 으로 한다.
-    /*
+
     private void handleConnect(StompHeaderAccessor accessor) throws MessageDeliveryException {
         // CONNECT 요청 처리 로직
     }
-    */
+
     private void handleDisconnect(StompHeaderAccessor accessor) throws MessageDeliveryException {
         // DISCONNECT 요청 처리 로직
         // TODO : 접속중인 방들로부터 탈퇴 처리를 해야 할까?
     }
 
     private void handleSubscribe(StompHeaderAccessor accessor) throws MessageDeliveryException {
-        // SUBSCRIBE 요청 처리 로직
-        // TODO : 해당 방에 입장 가능한 상황인지 검사
+        String destination = accessor.getDestination();
+        if (destination == null) throw new MessageDeliveryException("Null");
+        if (destination.equals("/sub/channel/A")) return; // TODO : Stomp 테스트를 위한 보안 기능 해제
+        if (!destination.startsWith("/sub/channel/")) throw new MessageDeliveryException("Illegal path");
+
+        String roomId = destination.substring(13);
+        if(roomService.isJoined(roomId)) throw new MessageDeliveryException("Already");
+
+        log.info("Joining... room id : {}", roomId);
+        try {
+            roomService.joinRoom(new RoomJoinRequest(roomId));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new MessageDeliveryException("Join failed");
+        }
     }
 
-    private void handleSend(StompHeaderAccessor accessor) throws MessageDeliveryException {
-        // SEND 요청 처리 로직
-        // TODO : send 요청에 대한 유효성 검사
+    private void handleUnSubscribe(StompHeaderAccessor accessor) throws MessageDeliveryException {
+        String destination = accessor.getFirstNativeHeader("id");
+        if (destination == null) throw new MessageDeliveryException("Null");
+        if (destination.equals("/sub/channel/A")) return; // TODO : Stomp 테스트를 위한 보안 기능 해제
+        if (!destination.startsWith("/sub/channel/")) throw new MessageDeliveryException("Illegal path");
+
+        String roomId = destination.substring(13);
+        if(!roomService.isJoined(roomId)) throw new MessageDeliveryException("Already");
+
+        log.info("Exiting... room id : {}", roomId);
+        // TODO : 방 탈퇴 기능 구현
+    }
+
+    private void handleSend(Message<?> message) throws MessageDeliveryException {
+        Object payload = message.getPayload();
+        if (!(payload instanceof byte[])) throw new MessageDeliveryException("Null");
+
+        String jsonPayload = new String((byte[]) payload, StandardCharsets.UTF_8);
+        String roomId;
+        try {roomId = MyMessage.fromJson(jsonPayload).channelId();}
+        catch (Exception e) {
+            throw new MessageDeliveryException("Null");
+        }
+
+        log.info("extracted channelId : {}", roomId);
+        if(!roomService.isJoined(roomId)) throw new MessageDeliveryException("Permission");
     }
 }

@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.2/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h1>Connection</h1>
+<label>Channel:</label>
+<br>
+<input type="text" id="connection-input" placeholder="Enter a channel">
+<br>
+<button onclick="subscribe()">connect</button>
+<button onclick="unsubscribe()">connect</button>
+<h1>WebSocket Chat</h1>
+
+    <label>Message:</label>
+    <br>
+    <input type="radio" name="messageType" value="ENTER" checked>ENTER
+    <input type="radio" name="messageType" value="TALK"> TALK
+    <input type="radio" name="messageType" value="QUIT"> QUIT
+    <br>
+    <input type="text" id="sender-input" placeholder="Enter a sender">
+    <br>
+    <input type="text" id="channel-input" placeholder="Enter a channelId">
+    <br>
+    <input type="text" id="message-input" placeholder="Enter a message">
+    <br>
+    <button onclick="sendMessage()">Send</button>
+
+<ul id="messages">
+    <!-- Messages will be inserted here -->
+</ul>
+
+<script>
+    var stompClient = null;
+
+    function connect() {
+        var socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+
+        });
+    }
+    function subscribe() {
+        var channel = document.getElementById('connection-input').value;
+        stompClient.subscribe('/sub/channel/' + channel, function (response) {
+            console.log(response);
+        });
+    }
+    function unsubscribe() {
+        var channel = document.getElementById('connection-input').value;
+        stompClient.unsubscribe('/sub/channel/' + channel, function (response) {
+            console.log(response);
+        });
+    }
+    function disconnect() {
+        if (stompClient !== null) {
+            stompClient.disconnect();
+        }
+        console.log("Disconnected");
+    }
+
+    function sendMessage() {
+        var messageType = document.querySelector('input[name="messageType"]:checked').value;
+        var sender = document.getElementById('sender-input').value;
+        var channel = document.getElementById('channel-input').value;
+        var message = document.getElementById('message-input').value;
+
+        var jsonMessage = {
+            "type" : messageType,
+            "sender" : sender,
+            "channelId" : channel,
+            "data" : message
+        };
+        stompClient.send("/pub/test", {}, JSON.stringify(jsonMessage));
+    }
+
+    function showMessage(message) {
+        var messages = document.getElementById('messages');
+        var li = document.createElement('li');
+        li.appendChild(document.createTextNode(message));
+        messages.appendChild(li);
+    }
+
+    connect();
+</script>
+
+</body>
+</html>
