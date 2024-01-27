@@ -10,7 +10,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Room {
-    public static int MAX_JOINED = 7; // 방 최대 인원
+    final public static int MAX_JOINED = 7; // 방 최대 인원
     private String roomId; // 채팅방 아이디
     private String roomName; // 채팅방 이름
     private String ownerMemberId;

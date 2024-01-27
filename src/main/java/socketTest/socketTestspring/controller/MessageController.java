@@ -17,12 +17,9 @@ public class MessageController {
      * /pub/hello                   - 발행
      * @param message Message dto
      */
-    @MessageMapping("hello")
+    @MessageMapping("send")
     public void sendMessage(MyMessage message) {
-        simpMessageSendingOperations.convertAndSend("/sub/channel/" + message.channelId(), message);
-    }
-    @MessageMapping("test")
-    public void sendMessageTest(MyMessage message) {
+        // TODO : message type 에 따른 적절한 검증 로직
         simpMessageSendingOperations.convertAndSend("/sub/channel/" + message.channelId(), message);
     }
 }
