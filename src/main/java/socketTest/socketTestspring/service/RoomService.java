@@ -1,6 +1,7 @@
 package socketTest.socketTestspring.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import static socketTest.socketTestspring.exception.myExceptions.ServerConnectio
 
 
 @Service
+@Slf4j
 @Transactional
 @RequiredArgsConstructor
 public class RoomService {
@@ -33,6 +35,11 @@ public class RoomService {
         return roomRepository.findByRoomId(roomId).orElseThrow(() ->
                 new MyException(BAD_ROOM_ACCESS, "No rooms found")
         );
+    }
+    private String getUserId() {
+        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("user Id : {}", memberId);
+        return memberId;
     }
     //===== http request에서 사용되는 메소드
     public List<RoomDto> roomList() {
@@ -45,14 +52,14 @@ public class RoomService {
     }
 
     public RoomCreateResponse createRoom(RoomCreateRequest roomCreateRequest) {
-        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String memberId = getUserId();
         Room room = new Room(roomCreateRequest.roomName(), memberId);
         roomRepository.saveRoom(room);
         return new RoomCreateResponse(room.getRoomId(), room.getRoomName());
     }
 
     public RoomDeleteResponse deleteRoom(RoomDeleteRequest roomDeleteRequest) {
-        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String memberId = getUserId();
         if(!findOne(roomDeleteRequest.roomId()).getOwnerMemberId().equals(memberId)) // Possible exception: MyException may be thrown.
             throw new MyException(BAD_ROOM_ACCESS, "You are not the owner of the room");
 
@@ -63,7 +70,7 @@ public class RoomService {
     }
     //==== 웹소켓 인터셉터에서 사용되는 메소드
     public boolean joinRoom(String roomId) throws MessageDeliveryException {
-        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String memberId = getUserId();
         Room joinRoom = roomRepository.findByRoomId(roomId).orElseThrow(() ->
                 new MessageDeliveryException(BAD_MESSAGE.toString()));
 
@@ -71,7 +78,7 @@ public class RoomService {
     }
 
     public boolean exitRoom(String roomId) throws MessageDeliveryException {
-        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String memberId = getUserId();
         Room exitRoom = roomRepository.findByRoomId(roomId).orElseThrow(() ->
                 new MessageDeliveryException(BAD_MESSAGE.toString()));
 
@@ -79,7 +86,7 @@ public class RoomService {
     }
 
     public boolean isJoined(String roomId) throws MessageDeliveryException {
-        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String memberId = getUserId();
         Room byRoomId = roomRepository.findByRoomId(roomId).orElseThrow(() ->
                 new MessageDeliveryException(BAD_MESSAGE.toString()));
 
