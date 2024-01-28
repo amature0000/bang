@@ -28,6 +28,9 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
         if(exceptionMessage.equals(NO_PERMISSION.toString())) {
             return errorHandleException("You have no permission for this action", NO_PERMISSION);
         }
+        if(exceptionMessage.equals(BAD_MESSAGE.toString())) {
+            return errorHandleException("This message is not acceptable", BAD_MESSAGE);
+        }
         // message handle
         if(exceptionMessage.equals(ACTION_FAILED.toString())) {
             return messageHandleException("Action failed", ACTION_FAILED);
