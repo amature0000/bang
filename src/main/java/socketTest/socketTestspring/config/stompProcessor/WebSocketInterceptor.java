@@ -102,8 +102,8 @@ public class WebSocketInterceptor implements ChannelInterceptor {
         if (destination == null) throw new MessageDeliveryException(BAD_HEADER.toString());
 
         boolean isOnboard = roomService.onboardCheck(roomId);
-        boolean temp = destination.startsWith("/pub/chat");
-        if (!(temp || destination.startsWith("/pub/game")) || (temp ^ isOnboard))
+        boolean temp = destination.startsWith("/pub/game");
+        if (!(destination.startsWith("/pub/chat") || temp) || (temp ^ isOnboard))
             throw new MessageDeliveryException(ILLEGAL_PATH.toString());
         // 요청 유효성 검사
         log.info("extracted channelId : {}", roomId);

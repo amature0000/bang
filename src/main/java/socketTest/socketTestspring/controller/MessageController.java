@@ -15,7 +15,7 @@ public class MessageController {
 
     /**
      * /sub/channel/{channelId}     - 구독        <br>
-     * /pub/{mappingId}                   - 발행
+     * /pub/{mappingId}             - 발행
      * @param message Message dto
      */
     @MessageMapping("chat")
