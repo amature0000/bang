@@ -63,9 +63,7 @@ public class WebSocketInterceptor implements ChannelInterceptor {
         String destination = accessor.getDestination();
         if (destination == null) throw new MessageDeliveryException(BAD_HEADER.toString());
         if (!destination.startsWith("/sub/channel/")) throw new MessageDeliveryException(ILLEGAL_PATH.toString());
-        // 이미 수행된 동작인지 검사
         String roomId = destination.substring(13);
-        if (roomService.isJoined(roomId)) throw new MessageDeliveryException(DUPLICATED_ACTION.toString());
         // 요청 수행
         log.info("Joining... room id : {}", roomId);
         if (!roomService.joinRoom(roomId)) throw new MessageDeliveryException(ACTION_FAILED.toString());
@@ -76,9 +74,7 @@ public class WebSocketInterceptor implements ChannelInterceptor {
         String destination = accessor.getFirstNativeHeader("id"); // SUBSCRIBE 메세지로부터 할당된 id
         if (destination == null) throw new MessageDeliveryException(BAD_HEADER.toString());
         if (!destination.startsWith("/sub/channel/")) throw new MessageDeliveryException(ILLEGAL_PATH.toString());
-        // 이미 수행된 동작인지 검사
         String roomId = destination.substring(13);
-        if (!roomService.isJoined(roomId)) throw new MessageDeliveryException(DUPLICATED_ACTION.toString());
         // 요청 수행
         log.info("Exiting... room id : {}", roomId);
         if (!roomService.exitRoom(roomId)) throw new MessageDeliveryException(ACTION_FAILED.toString());

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static socketTest.socketTestspring.config.stompProcessor.StompErrorCode.BAD_MESSAGE;
+import static socketTest.socketTestspring.config.stompProcessor.StompErrorCode.DUPLICATED_ACTION;
 import static socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode.BAD_ROOM_ACCESS;
 
 
@@ -73,7 +74,8 @@ public class RoomService {
         String memberId = getUserId();
         Room joinRoom = roomRepository.findByRoomId(roomId).orElseThrow(() ->
                 new MessageDeliveryException(BAD_MESSAGE.toString()));
-
+        MemberInfo memberInfo = new MemberInfo(memberId);
+        if(joinRoom.getJoinedMembers().contains(memberInfo)) throw new MessageDeliveryException(DUPLICATED_ACTION.toString());
         return roomRepository.joinRoom(joinRoom, new MemberInfo(memberId));
     }
 
@@ -81,16 +83,9 @@ public class RoomService {
         String memberId = getUserId();
         Room exitRoom = roomRepository.findByRoomId(roomId).orElseThrow(() ->
                 new MessageDeliveryException(BAD_MESSAGE.toString()));
-
+        MemberInfo memberInfo = new MemberInfo(memberId);
+        if(!exitRoom.getJoinedMembers().contains(memberInfo)) throw new MessageDeliveryException(DUPLICATED_ACTION.toString());
         return roomRepository.quitRoom(exitRoom, new MemberInfo(memberId));
-    }
-
-    public boolean isJoined(String roomId) throws MessageDeliveryException {
-        String memberId = getUserId();
-        Room byRoomId = roomRepository.findByRoomId(roomId).orElseThrow(() ->
-                new MessageDeliveryException(BAD_MESSAGE.toString()));
-
-        return byRoomId.getJoinedMembers().contains(new MemberInfo(memberId));
     }
 
     public boolean onboardCheck(String roomId) throws MessageDeliveryException {
