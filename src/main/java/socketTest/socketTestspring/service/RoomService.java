@@ -88,6 +88,13 @@ public class RoomService {
         return roomRepository.quitRoom(exitRoom, new MemberInfo(memberId));
     }
 
+    public boolean isJoined(String roomId) throws MessageDeliveryException {
+        String memberId = getUserId();
+        Room byRoomId = roomRepository.findByRoomId(roomId).orElseThrow(() ->
+                new MessageDeliveryException(BAD_MESSAGE.toString()));
+        return byRoomId.getJoinedMembers().contains(new MemberInfo(memberId));
+    }
+
     public boolean onboardCheck(String roomId) throws MessageDeliveryException {
         Room byRoomId = roomRepository.findByRoomId(roomId).orElseThrow(() ->
                 new MessageDeliveryException(BAD_MESSAGE.toString()));
