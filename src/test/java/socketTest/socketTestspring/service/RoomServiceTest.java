@@ -17,8 +17,6 @@ import socketTest.socketTestspring.dto.room.create.RoomCreateRequest;
 import socketTest.socketTestspring.dto.room.create.RoomCreateResponse;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteRequest;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteResponse;
-import socketTest.socketTestspring.dto.room.join.RoomJoinRequest;
-import socketTest.socketTestspring.dto.room.join.RoomJoinResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,11 +70,10 @@ class RoomServiceTest {
         RoomCreateResponse roomCreateResponse = roomService.createRoom(roomCreateRequest);
         String roomId = roomCreateResponse.roomId();
         // given
-        RoomJoinRequest roomJoinRequest = new RoomJoinRequest(roomId);
         // when
-        RoomJoinResponse roomJoinResponse = roomService.joinRoom(roomJoinRequest);
+        boolean result = roomService.joinRoom(roomId);
         // then
-        assertThat(roomJoinResponse.response()).isEqualTo("joined");
+        assertThat(result).isTrue();
     }
     @Test
     void 입장체크테스트() {
@@ -84,13 +81,66 @@ class RoomServiceTest {
         RoomCreateRequest roomCreateRequest = new RoomCreateRequest("room name");
         RoomCreateResponse roomCreateResponse = roomService.createRoom(roomCreateRequest);
         String roomId = roomCreateResponse.roomId();
-
+        roomService.joinRoom(roomId);
         //given
-        RoomJoinRequest roomJoinRequest = new RoomJoinRequest(roomId);
-        RoomJoinResponse roomJoinResponse = roomService.joinRoom(roomJoinRequest);
         //when
         //then
         boolean result = roomService.isJoined(roomId);
-        assertThat(result).isEqualTo(true);
+        assertThat(result).isTrue();
+    }
+    @Test
+    void 입장체크테스트2() {
+        // init
+        RoomCreateRequest roomCreateRequest = new RoomCreateRequest("room name");
+        RoomCreateRequest roomCreateRequest2 = new RoomCreateRequest("room name2");
+
+        RoomCreateResponse roomCreateResponse = roomService.createRoom(roomCreateRequest);
+        RoomCreateResponse roomCreateResponse2 = roomService.createRoom(roomCreateRequest2);
+
+        String roomId = roomCreateResponse.roomId();
+        String roomId2 = roomCreateResponse2.roomId();
+
+        roomService.joinRoom(roomId);
+        //given
+        //when
+        boolean result = roomService.isJoined(roomId2);
+        //then
+        assertThat(result).isFalse();
+    }
+    @Test
+    void 퇴장테스트() {
+        // init
+        RoomCreateRequest roomCreateRequest = new RoomCreateRequest("room name");
+        RoomCreateResponse roomCreateResponse = roomService.createRoom(roomCreateRequest);
+        String roomId = roomCreateResponse.roomId();
+        roomService.joinRoom(roomId);
+        //given
+        //when
+        boolean result = roomService.exitRoom(roomId);
+        //then
+        assertThat(result).isTrue();
+        //when
+        boolean result2 = roomService.exitRoom(roomId);
+        //then
+        assertThat(result2).isFalse();
+    }
+    @Test
+    void 퇴장테스트2() {
+        // init
+        RoomCreateRequest roomCreateRequest = new RoomCreateRequest("room name");
+        RoomCreateRequest roomCreateRequest2 = new RoomCreateRequest("room name2");
+
+        RoomCreateResponse roomCreateResponse = roomService.createRoom(roomCreateRequest);
+        RoomCreateResponse roomCreateResponse2 = roomService.createRoom(roomCreateRequest2);
+
+        String roomId = roomCreateResponse.roomId();
+        String roomId2 = roomCreateResponse2.roomId();
+
+        roomService.joinRoom(roomId);
+        //given
+        //when
+        boolean result = roomService.exitRoom(roomId2);
+        //then
+        assertThat(result).isFalse();
     }
 }

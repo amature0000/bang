@@ -76,7 +76,7 @@
             "channelId" : channel,
             "data" : message
         };
-        stompClient.send("/pub/test", {}, JSON.stringify(jsonMessage));
+        stompClient.send("/pub/chat", {}, JSON.stringify(jsonMessage));
     }
 
     function showMessage(message) {

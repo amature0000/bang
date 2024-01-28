@@ -1,6 +1,7 @@
 package socketTest.socketTestspring.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,8 +12,6 @@ import socketTest.socketTestspring.dto.room.create.RoomCreateRequest;
 import socketTest.socketTestspring.dto.room.create.RoomCreateResponse;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteRequest;
 import socketTest.socketTestspring.dto.room.delete.RoomDeleteResponse;
-import socketTest.socketTestspring.dto.room.join.RoomJoinRequest;
-import socketTest.socketTestspring.dto.room.join.RoomJoinResponse;
 import socketTest.socketTestspring.exception.MyException;
 import socketTest.socketTestspring.repository.MemoryRoomRepository;
 
@@ -20,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static socketTest.socketTestspring.config.stompProcessor.StompErrorCode.BAD_MESSAGE;
 import static socketTest.socketTestspring.exception.myExceptions.ServerConnectionErrorCode.BAD_ROOM_ACCESS;
 
 
@@ -34,7 +34,7 @@ public class RoomService {
                 new MyException(BAD_ROOM_ACCESS, "No rooms found")
         );
     }
-    //===== 방 관리
+    //===== http request에서 사용되는 메소드
     public List<RoomDto> roomList() {
         List<RoomDto> roomDtoList = roomRepository.findAll().values().stream()
                 .map(RoomDto::fromRoom)
@@ -61,21 +61,35 @@ public class RoomService {
         );
         return new RoomDeleteResponse("room deleted");
     }
-    //==== 방 입장, 퇴장 등
-    public RoomJoinResponse joinRoom(RoomJoinRequest roomJoinRequest) {
+    //==== 웹소켓 인터셉터에서 사용되는 메소드
+    public boolean joinRoom(String roomId) throws MessageDeliveryException {
         String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        Room joinRoom = findOne(roomJoinRequest.roomId()); // Possible exception: MyException may be thrown.
-        MemberInfo memberInfo = new MemberInfo(memberId);
+        Room joinRoom = roomRepository.findByRoomId(roomId).orElseThrow(() ->
+                new MessageDeliveryException(BAD_MESSAGE.toString()));
 
-        boolean result = roomRepository.joinRoom(joinRoom, memberInfo);
-        if (!result) throw new MyException(BAD_ROOM_ACCESS, "Cannot join the room");
-        return new RoomJoinResponse("joined");
+        return roomRepository.joinRoom(joinRoom, new MemberInfo(memberId));
     }
 
-    public boolean isJoined(String roomId) { // Must not throw any exceptions
+    public boolean exitRoom(String roomId) throws MessageDeliveryException {
         String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        Room byRoomId = roomRepository.findByRoomId(roomId).orElse(null);
-        if(byRoomId == null) return false;
+        Room exitRoom = roomRepository.findByRoomId(roomId).orElseThrow(() ->
+                new MessageDeliveryException(BAD_MESSAGE.toString()));
+
+        return roomRepository.quitRoom(exitRoom, new MemberInfo(memberId));
+    }
+
+    public boolean isJoined(String roomId) throws MessageDeliveryException {
+        String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Room byRoomId = roomRepository.findByRoomId(roomId).orElseThrow(() ->
+                new MessageDeliveryException(BAD_MESSAGE.toString()));
+
         return byRoomId.getJoinedMembers().contains(new MemberInfo(memberId));
+    }
+
+    public boolean onboardCheck(String roomId) throws MessageDeliveryException {
+        Room byRoomId = roomRepository.findByRoomId(roomId).orElseThrow(() ->
+                new MessageDeliveryException(BAD_MESSAGE.toString()));
+
+        return byRoomId.isOnboard();
     }
 }

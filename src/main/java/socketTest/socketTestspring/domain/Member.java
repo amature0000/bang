@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import socketTest.socketTestspring.dto.member.join.MemberJoinRequest;
 
 @Entity
 @Getter
@@ -32,11 +31,5 @@ public class Member {
         this.memberPassword = memberPassword;
         this.memberName = memberName;
         this.role = MemberRole.ROLE_USER;
-    }
-
-    public Member(MemberJoinRequest memberJoinRequest){
-        this.memberId = memberJoinRequest.memberId();
-        this.memberPassword = memberJoinRequest.memberPassword();
-        this.memberName = memberJoinRequest.memberName();
     }
 }
