@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import socketTest.socketTestspring.domain.Room;
 import socketTest.socketTestspring.dto.room.RoomDto;
 import socketTest.socketTestspring.dto.room.create.RoomCreateRequest;
 import socketTest.socketTestspring.dto.room.create.RoomCreateResponse;
@@ -38,5 +39,11 @@ public class RoomController {
     public MyResponse<RoomDeleteResponse> deleteRoom(@RequestBody RoomDeleteRequest roomDeleteRequest){
         RoomDeleteResponse roomDeleteResponse = roomService.deleteRoom(roomDeleteRequest);
         return MyResponse.success(roomDeleteResponse);
+    }
+
+    @PostMapping("/room")
+    public MyResponse<Room> findRoom(@RequestBody String roomId) {
+        Room room = roomService.findOne(roomId);
+        return MyResponse.success(room);
     }
 }

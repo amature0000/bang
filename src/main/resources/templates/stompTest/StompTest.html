@@ -7,12 +7,17 @@
 </head>
 <body>
 <h1>Connection</h1>
+<label>Connection:</label>
+<br>
+<button onclick="connect()">connect</button>
+<button onclick="disconnect()">disconnect</button>
+<h1>Subscription</h1>
 <label>Channel:</label>
 <br>
 <input type="text" id="connection-input" placeholder="Enter a channel">
 <br>
-<button onclick="subscribe()">connect</button>
-<button onclick="unsubscribe()">connect</button>
+<button onclick="subscribe()">subscribe</button>
+<button onclick="unsubscribe()">unsubscribe</button>
 <h1>WebSocket Chat</h1>
 
     <label>Message:</label>
@@ -85,8 +90,6 @@
         li.appendChild(document.createTextNode(message));
         messages.appendChild(li);
     }
-
-    connect();
 </script>
 
 </body>
